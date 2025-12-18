@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>练习中心</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="pb-20">
+
+    <!-- 1. 顶部：学科切换与练习数据 (Subject Switcher & Stats) -->
+    <div
+        class="bg-gradient-to-br from-[#09C0D7] to-[#06A2B5] text-white p-6 pt-8 rounded-b-[2.5rem] shadow-lg relative z-10 overflow-hidden">
+        <!-- 装饰背景 -->
+        <div class="absolute top-0 right-0 opacity-10 transform translate-x-10 -translate-y-10">
+            <i data-lucide="file-check" class="w-32 h-32"></i>
+        </div>
+
+        <!-- 顶部栏：学科切换 + 筛选 -->
+        <div class="flex justify-between items-center mb-6 relative z-10">
+            <!-- 学科切换 (横向平铺) -->
+            <div class="flex bg-white/20 p-1 rounded-full backdrop-blur-md border border-white/10"
+                id="subject-switcher">
+                <button onclick="switchSubject(this, '语文')"
+                    class="px-4 py-1.5 rounded-full text-xs font-bold bg-white text-[#09C0D7] shadow-sm transition-all">语文</button>
+                <button onclick="switchSubject(this, '数学')"
+                    class="px-4 py-1.5 rounded-full text-xs font-bold text-white/90 hover:bg-white/10 transition-all">数学</button>
+                <button onclick="switchSubject(this, '英语')"
+                    class="px-4 py-1.5 rounded-full text-xs font-bold text-white/90 hover:bg-white/10 transition-all">英语</button>
+            </div>
+
+            <!-- 筛选入口 -->
+            <button onclick="toggleFilterModal()"
+                class="flex items-center gap-1 bg-white/20 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-sm border border-white/20 active:scale-95 transition-transform hover:bg-white/30">
+                <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-2 relative z-10">
+            <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+                <div class="text-cyan-100 text-xs mb-1">错题组卷 (PDF)</div>
+                <div class="text-2xl font-bold flex items-end gap-1">
+                    8 <span class="text-sm font-normal opacity-70 mb-1">份</span>
+                </div>
+            </div>
+            <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+                <div class="text-cyan-100 text-xs mb-1">精准练习 (推送)</div>
+                <div class="text-2xl font-bold flex items-end gap-1">
+                    15 <span class="text-sm font-normal opacity-70 mb-1">次</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 内容列表区域 (合并后) -->
+    <div class="px-4 mt-6 mb-4 flex justify-between items-center">
+        <h2 class="font-bold text-gray-800 text-lg">练习记录</h2>
+        <span class="text-xs text-gray-400">共 12 条记录</span>
+    </div>
+
+    <div class="px-4 space-y-4 min-h-[400px]" id="list-content">
+
+        <!-- 列表 A: 错题组卷 (PDF History) -->
+            <!-- Card 1: 语文 (Red) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden" data-subject="语文" data-type="paper">
+                <!-- Left Indicator -->
+                <div class="absolute top-4 left-0 w-1 h-8 rounded-r-full bg-[#FF5E5E]"></div>
+
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-4 pl-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded bg-[#FF5E5E] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                            语
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm">第3单元错题攻克卷</h3>
+                    </div>
+                    <span class="bg-red-50 text-[#FF5E5E] text-[10px] font-bold px-2 py-0.5 rounded">
+                        包含变式题
+                    </span>
+                </div>
+
+                <!-- Info Row -->
+                <div class="flex justify-between items-end mb-5 pl-2 text-xs">
+                    <div class="text-gray-400">
+                        <div class="mb-1">生成时间</div>
+                        <div class="font-medium text-gray-600 font-mono">2023-10-26 19:30</div>
+                    </div>
+                    <div class="flex items-end gap-1 text-gray-400">
+                        <span class="mb-0.5">共</span>
+                        <span class="text-xl font-black text-gray-800 leading-none">28</span>
+                        <span class="mb-0.5">题</span>
+                    </div>
+                </div>
+
+                <!-- Action Row -->
+                <div class="flex gap-3 pl-2">
+                    <button
+                        class="flex-1 py-2.5 bg-[#FF5E5E] text-white rounded-full text-xs font-bold shadow-lg shadow-red-200 active:scale-95 transition-transform flex items-center justify-center gap-1.5 hover:bg-[#ff4444]">
+                        <i data-lucide="download" class="w-4 h-4"></i> 重新导出 PDF
+                    </button>
+                    <button onclick="previewPaper()"
+                        class="px-6 py-2.5 bg-white text-gray-600 rounded-full text-xs font-bold border border-gray-200 active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gray-50">
+                        <i data-lucide="eye" class="w-4 h-4"></i> 预览
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: 数学 (Blue) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden" data-subject="数学" data-type="paper">
+                <!-- Left Indicator -->
+                <div class="absolute top-4 left-0 w-1 h-8 rounded-r-full bg-[#3B82F6]"></div>
+
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-4 pl-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded bg-[#3B82F6] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                            数
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm">期中考试模拟复习卷</h3>
+                    </div>
+                    <span class="bg-blue-50 text-[#3B82F6] text-[10px] font-bold px-2 py-0.5 rounded">
+                        包含变式题
+                    </span>
+                </div>
+
+                <!-- Info Row -->
+                <div class="flex justify-between items-end mb-5 pl-2 text-xs">
+                    <div class="text-gray-400">
+                        <div class="mb-1">生成时间</div>
+                        <div class="font-medium text-gray-600 font-mono">2023-10-27 08:15</div>
+                    </div>
+                    <div class="flex items-end gap-1 text-gray-400">
+                        <span class="mb-0.5">共</span>
+                        <span class="text-xl font-black text-gray-800 leading-none">35</span>
+                        <span class="mb-0.5">题</span>
+                    </div>
+                </div>
+
+                <!-- Action Row -->
+                <div class="flex gap-3 pl-2">
+                    <button
+                        class="flex-1 py-2.5 bg-[#3B82F6] text-white rounded-full text-xs font-bold shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-1.5 hover:bg-[#2563eb]">
+                        <i data-lucide="download" class="w-4 h-4"></i> 重新导出 PDF
+                    </button>
+                    <button onclick="previewPaper()"
+                        class="px-6 py-2.5 bg-white text-gray-600 rounded-full text-xs font-bold border border-gray-200 active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gray-50">
+                        <i data-lucide="eye" class="w-4 h-4"></i> 预览
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 3: 英语 (Purple) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden" data-subject="英语" data-type="paper">
+                <!-- Left Indicator -->
+                <div class="absolute top-4 left-0 w-1 h-8 rounded-r-full bg-[#A855F7]"></div>
+
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-4 pl-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded bg-[#A855F7] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                            英
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm">Module 1 单词听写卷</h3>
+                    </div>
+                </div>
+
+                <!-- Info Row -->
+                <div class="flex justify-between items-end mb-5 pl-2 text-xs">
+                    <div class="text-gray-400">
+                        <div class="mb-1">生成时间</div>
+                        <div class="font-medium text-gray-600 font-mono">2023-10-27 14:20</div>
+                    </div>
+                    <div class="flex items-end gap-1 text-gray-400">
+                        <span class="mb-0.5">共</span>
+                        <span class="text-xl font-black text-gray-800 leading-none">50</span>
+                        <span class="mb-0.5">题</span>
+                    </div>
+                </div>
+
+                <!-- Action Row -->
+                <div class="flex gap-3 pl-2">
+                    <button
+                        class="flex-1 py-2.5 bg-[#A855F7] text-white rounded-full text-xs font-bold shadow-lg shadow-purple-200 active:scale-95 transition-transform flex items-center justify-center gap-1.5 hover:bg-[#9333ea]">
+                        <i data-lucide="download" class="w-4 h-4"></i> 重新导出 PDF
+                    </button>
+                    <button onclick="previewPaper()"
+                        class="px-6 py-2.5 bg-white text-gray-600 rounded-full text-xs font-bold border border-gray-200 active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gray-50">
+                        <i data-lucide="eye" class="w-4 h-4"></i> 预览
+                    </button>
+                </div>
+            </div>
+
+        <!-- 列表 B: 精准推送 (已合并) -->
+
+            <!-- Card 1: 教师推荐 - 未开始 (显示打印) -->
+            <div class="bg-white rounded-2xl p-4 shadow-md border border-cyan-100 relative overflow-hidden" data-subject="数学" data-type="recommend">
+                <div
+                    class="absolute top-0 right-0 bg-[#09C0D7] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                    教师推荐
+                </div>
+                <div class="flex gap-3 items-start mb-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-cyan-50 flex items-center justify-center text-[#09C0D7] flex-shrink-0 border border-cyan-100">
+                        <i data-lucide="user-check" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">周末针对性强化：一元一次方程</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+                                共 5 题
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 状态栏: 未开始 -->
+                <div class="bg-gray-50 rounded-lg p-2 mb-3 flex justify-between items-center border border-gray-100">
+                    <div class="text-[10px] text-gray-500">请打印后线下作答，完成后拍照批改</div>
+                    <div class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">未开始</div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button
+                        class="flex-[2] py-2.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-lg text-xs font-bold shadow-lg shadow-cyan-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 导出PDF
+                    </button>
+                    <!-- 未打印前，批改按钮置灰或隐藏，或者点击提示先打印 -->
+                    <button
+                        class="flex-1 py-2.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> 批改
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 5b: 习作练习 (English) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-100 relative overflow-hidden" data-subject="英语" data-type="writing">
+                <div
+                    class="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                    习作练习
+                </div>
+                <div class="flex gap-3 items-start mb-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-600 flex-shrink-0 border border-pink-100">
+                        <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">Unit 3 Writing: My Best Friend</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded font-bold">
+                                Writing Task
+                            </span>
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+                                Time: 30min
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 mb-3 flex justify-between items-center border border-gray-100">
+                    <div class="text-[10px] text-gray-500">请使用英语作文本书写</div>
+                    <div class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">未开始</div>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-[2] py-2.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-lg text-xs font-bold shadow-lg shadow-cyan-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 导出PDF
+                    </button>
+                    <button
+                        class="flex-1 py-2.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> 批改
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: 专家精选 - 已打印/进行中 (显示重新打印 + 拍照批改) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-purple-100 relative overflow-hidden" data-subject="数学" data-type="expert">
+                <div
+                    class="absolute top-0 right-0 bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                    专家精选
+                </div>
+                <div class="flex gap-3 items-start mb-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0 border border-purple-100">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">2024年中考高频题型：几何辅助线</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold">
+                                难度 ★★★★
+                            </span>
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+                                共 8 题
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 状态栏: 已打印 -->
+                <div class="bg-blue-50 rounded-lg p-2 mb-3 flex justify-between items-center border border-blue-100">
+                    <div class="text-[10px] text-blue-600 flex items-center gap-1">
+                        <i data-lucide="clock" class="w-3 h-3"></i> 上次打印: 2小时前
+                    </div>
+                    <div
+                        class="text-[10px] font-bold text-blue-600 bg-white px-2 py-0.5 rounded border border-blue-100">
+                        作答中</div>
+                </div>
+
+                <div class="flex gap-2">
+                    <!-- 主操作变为拍照批改 -->
+                    <button
+                        class="flex-[2] py-2.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-lg text-xs font-bold shadow-lg shadow-cyan-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> 拍照批改
+                    </button>
+                    <!-- 次要操作: 重新打印 -->
+                    <button
+                        class="flex-1 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-bold active:scale-95 transition-transform flex items-center justify-center gap-1 hover:bg-gray-50">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 导出PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 3: 巩固练习 (NEW) -->
+            <div class="bg-white rounded-2xl p-4 shadow-md border border-cyan-100 relative overflow-hidden" data-subject="数学" data-type="practice">
+                <div
+                    class="absolute top-0 right-0 bg-[#F8AF1D] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                    巩固练习
+                </div>
+                <div class="flex gap-3 items-start mb-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-cyan-50 flex items-center justify-center text-[#09C0D7] flex-shrink-0 border border-cyan-100">
+                        <i data-lucide="target" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">课后巩固：二次函数基础</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+                                共 6 题
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 mb-3 flex justify-between items-center border border-gray-100">
+                    <div class="text-[10px] text-gray-500">请打印后线下作答</div>
+                    <div class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">未开始</div>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-[2] py-2.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-lg text-xs font-bold shadow-lg shadow-cyan-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 导出PDF
+                    </button>
+                    <button
+                        class="flex-1 py-2.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> 批改
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 4: 进阶练习 (NEW) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-purple-100 relative overflow-hidden" data-subject="数学" data-type="advanced">
+                <div
+                    class="absolute top-0 right-0 bg-[#44C61B] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                    进阶练习
+                </div>
+                <div class="flex gap-3 items-start mb-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0 border border-purple-100">
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">压轴题突破：动点问题</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold">
+                                难度 ★★★★★
+                            </span>
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+                                共 3 题
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 mb-3 flex justify-between items-center border border-gray-100">
+                    <div class="text-[10px] text-gray-500">挑战高分必备</div>
+                    <div class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">未开始</div>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-[2] py-2.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-lg text-xs font-bold shadow-lg shadow-cyan-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 导出PDF
+                    </button>
+                    <button
+                        class="flex-1 py-2.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> 批改
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 5: 习作练习 (NEW) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-100 relative overflow-hidden" data-subject="语文" data-type="writing">
+                <div
+                    class="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                    习作练习
+                </div>
+                <div class="flex gap-3 items-start mb-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-600 flex-shrink-0 border border-pink-100">
+                        <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-sm">第五单元习作：多彩的活动</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded font-bold">
+                                作文专项
+                            </span>
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+                                限时 40分钟
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 mb-3 flex justify-between items-center border border-gray-100">
+                    <div class="text-[10px] text-gray-500">请使用配套稿纸书写</div>
+                    <div class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">未开始</div>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="flex-[2] py-2.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-lg text-xs font-bold shadow-lg shadow-cyan-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 导出PDF
+                    </button>
+                    <button
+                        class="flex-1 py-2.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1">
+                        <i data-lucide="camera" class="w-3.5 h-3.5"></i> 批改
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 6: 已完成 (显示结果 + 重新打印) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 opacity-90" data-subject="语文" data-type="completed">
+                <div class="flex gap-3 items-start mb-3">
+                    <div
+                        class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0 border border-green-200 shadow-sm">
+                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-sm">古诗词默写专项 (已批改)</h3>
+                        <p class="text-xs text-gray-500 mt-1">AI 智能批改 · 10 题</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center border-t border-gray-50 pt-3 mt-2">
+                    <div class="flex items-center gap-2 bg-green-50 px-2 py-1 rounded-full">
+                        <span class="text-xs font-bold text-green-700">正确率</span>
+                        <span class="text-sm font-black text-green-700">90%</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button class="text-[10px] text-gray-400 underline hover:text-gray-600">导出PDF</button>
+                        <button class="text-[10px] text-[#09C0D7] font-bold flex items-center gap-1 hover:underline">
+                            查看详情 <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+    
+
+    </div>
+
+    <!-- 筛选弹窗 (Filter Modal) -->
+    <div id="filter-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="toggleFilterModal()">
+        </div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-gray-800">筛选练习记录</h3>
+                <button onclick="toggleFilterModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-6 pb-4">
+                <!-- 类型 -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">内容类型</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-cyan-50 text-[#09C0D7] border-[#09C0D7]">全部</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">错题组卷</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">教师推荐</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">专家精选</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">巩固练习</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">进阶练习</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-pink-50 text-pink-600 border-pink-200">习作练习</button>
+                    </div>
+                </div>
+
+                <!-- 状态 -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">完成状态</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">未开始</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">进行中</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">已完成</button>
+                    </div>
+                </div>
+
+                <!-- 时间 -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">时间范围</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">本周</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">本月</button>
+                        <button
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">本学期</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 mt-2 flex gap-3">
+                <button
+                    class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-colors">重置</button>
+                <button onclick="toggleFilterModal()"
+                    class="flex-[2] py-3 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 hover:bg-[#08acc0] transition-colors">确认筛选</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航占位 -->
+    <div class="fixed bottom-0 w-full bg-white border-t border-gray-100 py-3 flex justify-center text-xs text-gray-400">
+        [底部导航栏区域]
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Component: Badge
+        class BadgeElement extends HTMLElement {
+            connectedCallback() {
+                const icon = this.getAttribute('icon');
+                const text = this.getAttribute('text');
+                const color = this.getAttribute('color');
+                this.className = `flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium ${color}`;
+                this.innerHTML = `<i data-lucide="${icon}" class="w-3 h-3"></i> ${text}`;
+                lucide.createIcons({ root: this });
+            }
+        }
+        customElements.define('badge-item', BadgeElement);
+
+        // 预览
+        function previewPaper() {
+            // 跳转到预览页面
+            window.location.href = 'jsx_paper_preview.html';
+        }
+
+        // Toggle Filter Modal
+        function toggleFilterModal() {
+            const modal = document.getElementById('filter-modal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Subject Switcher Logic
+        let currentSubject = '语文';
+
+        function switchSubject(btn, subject) {
+            currentSubject = subject;
+            
+            // Visual update for buttons
+            const buttons = document.querySelectorAll('#subject-switcher button');
+            buttons.forEach(b => {
+                b.className = 'px-4 py-1.5 rounded-full text-xs font-bold text-white/90 hover:bg-white/10 transition-all';
+            });
+            btn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-white text-[#09C0D7] shadow-sm transition-all';
+
+            // Filter cards
+            filterCards();
+        }
+
+        function filterCards() {
+            const cards = document.querySelectorAll('#list-content > div');
+            let count = 0;
+            
+            cards.forEach(card => {
+                const cardSubject = card.getAttribute('data-subject');
+                
+                // Filter logic: Match subject
+                if (cardSubject === currentSubject) {
+                    card.classList.remove('hidden');
+                    card.classList.add('fade-in');
+                    count++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Update count
+            const countEl = document.querySelector('.text-gray-400');
+            if(countEl) countEl.textContent = `共 ${count} 条记录`;
+        }
+
+        // Initialize filter on load
+        window.addEventListener('DOMContentLoaded', () => {
+            filterCards();
+        });
+
+        // Helper Badge
+        const Badge = ({ icon, text, color }) => `
+            <div class="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium ${color}">
+                <i data-lucide="${icon}" class="w-3 h-3"></i> ${text}
+            </div>
+        `;
+    </script>
+
+    <script>
+        document.querySelectorAll('Badge').forEach(el => {
+            const icon = el.getAttribute('icon');
+            const text = el.getAttribute('text');
+            const color = el.getAttribute('color');
+            const div = document.createElement('div');
+            div.className = `flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium ${color}`;
+            div.innerHTML = `<i data-lucide="${icon}" class="w-3 h-3"></i> ${text}`;
+            el.replaceWith(div);
+        });
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

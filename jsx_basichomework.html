@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基础性作业专栏</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <style>
+        /* 1. 自定义主题色：#09C0D7 (Theme Color: Teal/Cyan) */
+        :root {
+            --primary-50: #e0f8fb;
+            --primary-100: #b5eff4;
+            --primary-300: #49d3e5;
+            --primary-500: #09c0d7;
+            /* Main Color */
+            --primary-600: #08a3b5;
+            --primary-700: #06808e;
+        }
+
+        /* 覆盖 Tailwind 颜色，使用自定义属性 */
+        .bg-primary-500 {
+            background-color: var(--primary-500);
+        }
+
+        .hover\:bg-primary-600:hover {
+            background-color: var(--primary-600);
+        }
+
+        .text-primary-500 {
+            color: var(--primary-500);
+        }
+
+        .bg-primary-50 {
+            background-color: var(--primary-50);
+        }
+
+        .border-primary-500 {
+            border-color: var(--primary-500);
+        }
+
+        .shadow-primary-100 {
+            box-shadow: 0 4px 6px -1px rgba(9, 192, 215, 0.1), 0 2px 4px -2px rgba(9, 192, 215, 0.06);
+        }
+
+        .hover\:bg-primary-100:hover {
+            background-color: var(--primary-100);
+        }
+
+        .bg-primary-500\/10 {
+            background-color: rgba(9, 192, 215, 0.1);
+        }
+
+        .border-primary-300 {
+            border-color: var(--primary-300);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-enter {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .sticky-header {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .progress-bar-fill {
+            transition: width 0.5s ease-out;
+        }
+
+        /* 隐藏滚动条 */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 文本溢出处理 */
+        .lesson-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        @media (min-width: 375px) {
+            .lesson-title {
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body class="pb-20">
+
+    <!-- 1. 顶部：学科切换、筛选与作业本信息 (Sticky Header) -->
+    <div class="bg-white sticky top-0 z-20 border-b border-gray-100 sticky-header">
+        <div class="p-4 flex flex-col gap-4">
+            <!-- 顶部学科切换 -->
+            <div class="overflow-x-auto scrollbar-hide">
+                <div class="flex gap-6 min-w-max px-2" id="subject-switcher">
+                    <button onclick="switchSubject(this, '数学')"
+                        class="pb-2 border-b-2 border-primary-500 text-primary-500 font-bold text-base transition-all">数学</button>
+                    <button onclick="switchSubject(this, '语文')"
+                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">语文</button>
+                    <button onclick="switchSubject(this, '英语')"
+                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">英语</button>
+                    <button onclick="switchSubject(this, '物理')"
+                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">物理</button>
+                    <button onclick="switchSubject(this, '化学')"
+                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">化学</button>
+                    <button onclick="switchSubject(this, '生物')"
+                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">生物</button>
+                </div>
+            </div>
+
+            <!-- 作业本概要卡片 (优化响应式布局) -->
+            <div
+                class="bg-primary-500 text-white p-4 rounded-xl shadow-lg flex flex-col gap-3 card-shadow shadow-primary-100">
+                <!-- 标题和教材切换 -->
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <h1 class="text-lg font-extrabold leading-tight" id="current-subject-title">九年级数学（下）</h1>
+                        <div class="text-[10px] opacity-80 mt-1">基础性作业（共 52 课时）</div>
+                    </div>
+                    <!-- 教材切换按钮 -->
+                    <button onclick="toggleTextbookModal()"
+                        class="bg-white/20 hover:bg-white/30 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-sm transition-colors flex items-center gap-0.5 whitespace-nowrap flex-shrink-0">
+                        <span id="current-version">人教版</span> · <span id="current-grade">九年级下</span> <i
+                            data-lucide="chevron-down" class="w-3 h-3"></i>
+                    </button>
+                </div>
+
+                <!-- 功能按钮组 -->
+                <div class="flex gap-2">
+                    <button onclick="alert('📖 正在跳转到答案/听力页面...')"
+                        class="flex-1 flex items-center justify-center gap-1 bg-white/20 px-2 py-1.5 rounded-lg text-[11px] font-bold backdrop-blur-sm border border-white/20 active:scale-95 transition-transform hover:bg-white/30">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> 查看答案
+                    </button>
+                    <button onclick="toggleAnalyticsModal()"
+                        class="flex-1 flex items-center justify-center gap-1 bg-white/20 px-2 py-1.5 rounded-lg text-[11px] font-bold backdrop-blur-sm border border-white/20 active:scale-95 transition-transform hover:bg-white/30">
+                        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> 专栏总览
+                    </button>
+                </div>
+
+                <!-- 进度与错题统计保持不变 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm font-medium">
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="send" class="w-4 h-4 text-primary-100"></i> 已完成 <span
+                                id="progress-done">12</span> / <span id="progress-total">52</span>
+                        </span>
+                        <span class="flex items-center gap-1 text-red-200">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i> 累计错题: <span id="total-mistakes">48</span> 题
+                        </span>
+                    </div>
+                    <div class="w-full bg-primary-600 rounded-full h-2">
+                        <div id="progress-bar" class="progress-bar-fill bg-green-400 h-2 rounded-full"
+                            style="width: 23%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 内容列表区域：课时目录 (Lesson Directory) -->
+    <!-- 优化: 移除 "基础练习与学习资源" 标签 -->
+    <div class="p-4 space-y-4 min-h-[500px] bg-gray-50" id="content-directory">
+
+        <!-- Chapter 1 - 仅作为容器，不包含点击交互 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+            <!-- Chapter Header - 移除点击事件和箭头，添加增强练习按钮 -->
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="font-bold text-base text-gray-800 flex items-center gap-2">
+                    <i data-lucide="folder-open" class="w-5 h-5 text-primary-500"></i> 第一章 二次函数
+                </h3>
+                <div class="flex items-center gap-3">
+                    <!-- 增强练习按钮 (移动到此处) -->
+                    <button onclick="handleEnhancedPractice('第一章 二次函数', ['A 卷 (基础巩固)', 'B 卷 (能力提升)', 'C 卷 (拓展挑战)'])"
+                        class="text-xs bg-primary-50 text-primary-600 px-2 py-1 rounded border border-primary-200 font-bold hover:bg-primary-100 transition-colors flex items-center gap-1">
+                        <i data-lucide="file-text" class="w-3 h-3"></i> 增强练习
+                    </button>
+                    <div class="text-sm text-gray-400 flex items-center gap-1">
+                        4/8 完成
+                    </div>
+                </div>
+            </div>
+            <!-- Lesson List - 默认展开 -->
+            <div id="lessons-1" class="fade-in p-3">
+                <!-- Lesson items dynamically rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 增强练习选择弹窗 (Enhanced Practice Modal - Chapter Level) -->
+    <div id="enhanced-practice-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleEnhancedPracticeModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800" id="enhanced-modal-title">选择增强练习卷</h3>
+                <button onclick="toggleEnhancedPracticeModal()" class="text-gray-400 hover:text-gray-600"><i
+                        data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-4 flex items-center gap-1">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-orange-500"></i>
+                专家推荐！建议根据自身学习情况选择合适的练习卷。
+            </p>
+
+            <!-- 练习卷列表 -->
+            <div id="enhanced-sets-list" class="space-y-3">
+                <!-- Sets populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 教材切换弹窗 (Textbook Switcher Modal) -->
+    <div id="textbook-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleTextbookModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">切换教材版本</h3>
+                <button onclick="toggleTextbookModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-4">
+                <!-- 教材版本选择 -->
+                <div>
+                    <div class="text-sm font-bold text-gray-700 mb-2">选择教材版本</div>
+                    <div class="space-y-2">
+                        <button onclick="selectTextbook('人教版')"
+                            class="w-full p-3 text-left rounded-lg bg-primary-50 border border-primary-200 text-primary-700 font-bold flex justify-between items-center">
+                            人教版 <i data-lucide="check" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="selectTextbook('北师大版')"
+                            class="w-full p-3 text-left rounded-lg bg-gray-50 border border-gray-100 text-gray-700 font-medium hover:bg-gray-100">
+                            北师大版
+                        </button>
+                        <button onclick="selectTextbook('苏教版')"
+                            class="w-full p-3 text-left rounded-lg bg-gray-50 border border-gray-100 text-gray-700 font-medium hover:bg-gray-100">
+                            苏教版
+                        </button>
+                        <button onclick="selectTextbook('沪教版')"
+                            class="w-full p-3 text-left rounded-lg bg-gray-50 border border-gray-100 text-gray-700 font-medium hover:bg-gray-100">
+                            沪教版
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 年级册别筛选 -->
+                <div>
+                    <div class="text-sm font-bold text-gray-700 mb-2">选择年级册别</div>
+                    <div class="grid grid-cols-2 gap-2" id="grade-selector">
+                        <button onclick="selectGrade(this, '七年级上')"
+                            class="p-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">七年级上</button>
+                        <button onclick="selectGrade(this, '七年级下')"
+                            class="p-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">七年级下</button>
+                        <button onclick="selectGrade(this, '八年级上')"
+                            class="p-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">八年级上</button>
+                        <button onclick="selectGrade(this, '八年级下')"
+                            class="p-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">八年级下</button>
+                        <button onclick="selectGrade(this, '九年级上')"
+                            class="p-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">九年级上</button>
+                        <button onclick="selectGrade(this, '九年级下')"
+                            class="p-2 text-sm font-bold rounded-lg border-2 border-primary-500 bg-primary-50 text-primary-600">九年级下
+                            ✓</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 专栏总览弹窗 (Analytics Modal) -->
+    <div id="analytics-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleAnalyticsModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">专栏学情总览</h3>
+                <button onclick="toggleAnalyticsModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- 总体进度 -->
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <div class="text-sm text-gray-500 mb-2">总体完成进度</div>
+                    <div class="flex items-end gap-2 mb-2">
+                        <span class="text-3xl font-extrabold text-primary-600">23%</span>
+                        <span class="text-sm text-gray-400 mb-1">已完成 12/52 课时</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary-500 h-2 rounded-full" style="width: 23%"></div>
+                    </div>
+                </div>
+
+                <!-- 核心指标 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                        <div class="text-xs text-red-400 mb-1">累计错题</div>
+                        <div class="text-2xl font-bold text-red-600">48 <span
+                                class="text-xs font-normal text-red-400">题</span></div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                        <div class="text-xs text-green-400 mb-1">得分率</div>
+                        <div class="text-2xl font-bold text-green-600">85% <span
+                                class="text-xs font-normal text-green-400">平均</span></div>
+                    </div>
+                </div>
+
+                <!-- 薄弱知识点 -->
+                <div>
+                    <div class="text-sm font-bold text-gray-800 mb-3">待强化知识点</div>
+                    <div class="space-y-2">
+                        <div
+                            class="flex justify-between items-center p-3 bg-white border border-gray-100 rounded-lg shadow-sm">
+                            <span class="text-sm text-gray-700">二次函数最值问题</span>
+                            <span class="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded">掌握率 65%</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center p-3 bg-white border border-gray-100 rounded-lg shadow-sm">
+                            <span class="text-sm text-gray-700">相似三角形判定</span>
+                            <span class="text-xs text-orange-500 font-bold bg-orange-50 px-2 py-1 rounded">掌握率
+                                40%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- 2. 内容列表区域：课时目录 (Lesson Directory) -->
+    <!-- 优化: 移除 "基础练习与学习资源" 标签 -->
+    <div class="p-4 space-y-4 min-h-[500px] bg-gray-50" id="content-directory">
+
+        <!-- Chapter 1 - 简化为分组标签 -->
+        <div class="mb-4">
+            <!-- Chapter Header - 轻量级分组标签 -->
+            <div class="flex justify-between items-center px-3 py-2 mb-2">
+                <h3 class="text-sm font-bold text-gray-600 flex items-center gap-1.5">
+                    <i data-lucide="layers" class="w-4 h-4 text-primary-500"></i>
+                    第一章 二次函数
+                    <span class="text-xs text-gray-400 font-normal ml-1">(4/8 完成)</span>
+                </h3>
+                <button onclick="handleEnhancedPractice('第一章 二次函数', ['A 卷 (基础巩固)', 'B 卷 (能力提升)', 'C 卷 (拓展挑战)'])"
+                    class="text-[11px] bg-primary-50 text-primary-600 px-2 py-1 rounded border border-primary-200 font-bold hover:bg-primary-100 transition-colors flex items-center gap-1">
+                    <i data-lucide="file-text" class="w-3 h-3"></i> 增强练习
+                </button>
+            </div>
+
+            <!-- Lesson List - 课时卡片直接在此渲染，无背景容器 -->
+            <div id="lessons-1" class="fade-in space-y-0">
+                <!-- Lesson items dynamically rendered here -->
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 4. 增强练习选择弹窗 (Enhanced Practice Modal - Chapter Level) -->
+    <div id="enhanced-practice-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleEnhancedPracticeModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800" id="enhanced-modal-title">选择增强练习卷</h3>
+                <button onclick="toggleEnhancedPracticeModal()" class="text-gray-400 hover:text-gray-600"><i
+                        data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-4 flex items-center gap-1">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-orange-500"></i>
+                专家推荐！建议根据自身学习情况选择合适的练习卷。
+            </p>
+
+            <!-- 练习卷列表 -->
+            <div id="enhanced-sets-list" class="space-y-3">
+                <!-- Sets populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 教材切换弹窗 (Textbook Switcher Modal) -->
+    <div id="textbook-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleTextbookModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">切换教材版本</h3>
+                <button onclick="toggleTextbookModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-2">
+                <button onclick="selectTextbook('人教版')"
+                    class="w-full p-4 text-left rounded-xl bg-primary-50 border border-primary-200 text-primary-700 font-bold flex justify-between items-center">
+                    人教版 (当前) <i data-lucide="check" class="w-5 h-5"></i>
+                </button>
+                <button onclick="selectTextbook('北师大版')"
+                    class="w-full p-4 text-left rounded-xl bg-gray-50 border border-gray-100 text-gray-700 font-medium hover:bg-gray-100">
+                    北师大版
+                </button>
+                <button onclick="selectTextbook('苏教版')"
+                    class="w-full p-4 text-left rounded-xl bg-gray-50 border border-gray-100 text-gray-700 font-medium hover:bg-gray-100">
+                    苏教版
+                </button>
+                <button onclick="selectTextbook('沪教版')"
+                    class="w-full p-4 text-left rounded-xl bg-gray-50 border border-gray-100 text-gray-700 font-medium hover:bg-gray-100">
+                    沪教版
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. 个性化练习生成弹窗 (Personalized Practice Modal) -->
+    <div id="personalized-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="togglePersonalizedModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">生成个性化练习</h3>
+                <button onclick="togglePersonalizedModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x"
+                        class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-5">
+                <!-- 目标课时与分析 -->
+                <div class="bg-primary-50 p-4 rounded-xl border border-primary-100">
+                    <div class="text-xs text-primary-600 font-bold mb-1">针对课时</div>
+                    <div class="text-sm font-bold text-gray-800 mb-2" id="personalized-target-title">第一章 二次函数</div>
+                    <div class="flex items-start gap-2 text-xs text-gray-600 bg-white/50 p-2 rounded-lg">
+                        <i data-lucide="brain-circuit" class="w-4 h-4 text-primary-500 flex-shrink-0 mt-0.5"></i>
+                        <span id="personalized-analysis">AI分析发现您在“函数图像性质”和“最值求解”方面存在薄弱点，建议加强练习。</span>
+                    </div>
+                </div>
+
+                <!-- 练习设置 -->
+                <div class="space-y-3">
+                    <div class="text-sm font-bold text-gray-700">难度偏好</div>
+                    <div class="flex gap-2" id="difficulty-selector">
+                        <button onclick="selectDifficulty(this, 'foundation')"
+                            class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">基础巩固</button>
+                        <button onclick="selectDifficulty(this, 'improvement')"
+                            class="flex-1 py-2 rounded-lg border-primary-500 bg-primary-50 text-sm font-bold text-primary-600 ring-1 ring-primary-500">能力提升</button>
+                        <button onclick="selectDifficulty(this, 'challenge')"
+                            class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">拓展挑战</button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="text-sm font-bold text-gray-700">题量设置</div>
+                    <div class="flex gap-2" id="count-selector">
+                        <button onclick="selectCount(this, 10)"
+                            class="flex-1 py-2 rounded-lg border-primary-500 bg-primary-50 text-sm font-bold text-primary-600 ring-1 ring-primary-500">10题
+                            (推荐)</button>
+                        <button onclick="selectCount(this, 15)"
+                            class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">15题</button>
+                        <button onclick="selectCount(this, 20)"
+                            class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">20题</button>
+                    </div>
+                </div>
+
+                <!-- 底部按钮 -->
+                <div class="flex gap-3 pt-2">
+                    <button onclick="generatePractice('download')"
+                        class="flex-1 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-base font-bold active:scale-95 transition-transform hover:bg-gray-50">
+                        生成并下载PDF
+                    </button>
+                    <button onclick="generatePractice('online')"
+                        class="flex-1 py-3 bg-primary-500 text-white rounded-xl text-base font-bold shadow-lg shadow-primary-100 active:scale-95 transition-transform hover:bg-primary-600">
+                        开始在线练习
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // 初始化图标
+        lucide.createIcons();
+
+        // 模拟数据结构
+        const mockLessons = [
+            { id: '1.1', title: '二次函数的概念', pages: 'P1-P5', problems: 15, status: 'completed', mistakes: 5, assigned: true, chapter: 1, allCorrect: false, allWrong: false, isListening: false },
+            { id: '1.2', title: '二次函数的图像和性质', pages: 'P6-P10', problems: 20, status: 'pending', deadline: '今日截止', assigned: true, chapter: 1, allCorrect: false, allWrong: false, isListening: false },
+            { id: '1.3', title: '抛物线的平移', pages: 'P11-P15', problems: 18, status: 'completed', mistakes: 0, assigned: false, chapter: 1, allCorrect: true, allWrong: false, isListening: false },
+            { id: '1.4', title: '二次函数最值问题', pages: 'P16-P20', problems: 25, status: 'completed', mistakes: 25, assigned: false, chapter: 1, allCorrect: false, allWrong: true, isListening: false },
+            { id: '1.5', title: '相似三角形判定', pages: 'P21-P25', problems: 12, status: 'unassigned', mistakes: 0, assigned: false, chapter: 1, allCorrect: false, allWrong: false, isListening: false },
+            { id: '1.6', title: '英汉词汇听力练习', pages: 'P25-P26', problems: 10, status: 'unassigned', mistakes: 0, assigned: false, chapter: 1, allCorrect: false, allWrong: false, isListening: true },
+        ];
+
+        // 渲染顶部进度条
+        function renderProgress() {
+            const completedLessons = mockLessons.filter(l => l.status === 'completed').length;
+            const totalLessons = mockLessons.length;
+            const totalMistakes = mockLessons.reduce((sum, l) => sum + (l.mistakes || 0), 0);
+            const progressPercentage = (completedLessons / totalLessons) * 100;
+
+            document.getElementById('progress-done').textContent = completedLessons;
+            document.getElementById('progress-total').textContent = totalLessons;
+            document.getElementById('total-mistakes').textContent = totalMistakes;
+            document.getElementById('progress-bar').style.width = `${progressPercentage.toFixed(0)}%`;
+        }
+
+        // 渲染课时列表 (集成所有优化)
+        function renderLessons(isFiltered) {
+            const lessonsContainer = document.getElementById('lessons-1');
+            const lessonsToRender = mockLessons.filter(l => l.chapter === 1);
+
+            lessonsContainer.innerHTML = '';
+
+            lessonsToRender.forEach(lesson => {
+                if (isFiltered && !lesson.assigned) {
+                    return;
+                }
+
+                let buttonGroup = '';
+                let lessonClass = 'hover:bg-gray-100 transition-colors';
+                let statusIcon = '<i data-lucide="minus-circle" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>';
+                let assignmentBadge = ''; // 删除教师任务标签
+                let emotionalIcon = '';
+                let mistakeInfo = '';
+
+                if (lesson.status === 'completed') {
+                    lessonClass = 'hover:bg-green-50/50 transition-colors bg-green-50/30';
+                    statusIcon = '<i data-lucide="check-circle" class="w-5 h-5 text-green-500 flex-shrink-0"></i>';
+                    if (lesson.allCorrect) {
+                        // 全对：显示"学情报告"+"进阶练习"
+                        emotionalIcon = '<i data-lucide="award" class="w-4 h-4 text-amber-500 fill-amber-400"></i>';
+                        mistakeInfo = `<span class="text-xs text-gray-400 mt-0.5">${lesson.pages} | 完美完成</span>`;
+                        buttonGroup += `
+                            <button class="bg-primary-500/10 text-primary-500 text-xs font-bold px-2.5 py-1.5 rounded-full hover:bg-primary-100 active:scale-95 transition-transform" onclick="viewDetails('${lesson.id}', 'report')">
+                                学情报告
+                            </button>
+                            <button class="bg-purple-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-full hover:bg-purple-600 active:scale-95 transition-transform" onclick="viewDetails('${lesson.id}', 'advanced')">
+                                进阶练习
+                            </button>
+                        `;
+                    } else if (lesson.mistakes > 0 || lesson.allWrong) {
+                        // 有错题：只显示"学情报告"
+                        mistakeInfo = `<span class="text-xs text-red-600 font-medium mt-0.5 flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> 错题: ${lesson.mistakes} 题待巩固</span>`;
+                        buttonGroup += `
+                            <button class="bg-primary-500/10 text-primary-500 text-xs font-bold px-2.5 py-1.5 rounded-full hover:bg-primary-100 active:scale-95 transition-transform" onclick="viewDetails('${lesson.id}', 'report')">
+                                学情报告
+                            </button>
+                        `;
+
+                        if (lesson.mistakes > 0) {
+                            buttonGroup += `
+                                <button class="bg-red-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-full hover:bg-red-600 active:scale-95 transition-transform" onclick="togglePersonalizedModal('${lesson.title}')">
+                                    个性化练习
+                                </button>
+                            `;
+                        }
+                    } else {
+                        // 完成，无错题：显示"学情报告"
+                        mistakeInfo = `<span class="text-xs text-gray-400 mt-0.5">${lesson.pages} | ${lesson.problems} 题</span>`;
+                        buttonGroup += `
+                            <button class="bg-primary-500/10 text-primary-500 text-xs font-bold px-2.5 py-1.5 rounded-full hover:bg-primary-100 active:scale-95 transition-transform" onclick="viewDetails('${lesson.id}', 'report')">
+                                学情报告
+                            </button>
+                        `;
+                    }
+                } else if (lesson.status === 'pending') {
+                    // 待收集 (原待打卡)
+                    lessonClass = 'hover:bg-yellow-50/50 transition-colors bg-yellow-50/30';
+                    statusIcon = '<i data-lucide="clock" class="w-5 h-5 text-yellow-500 flex-shrink-0"></i>';
+                    mistakeInfo = `<span class="text-xs text-red-600 font-medium mt-0.5">${lesson.pages} | ${lesson.problems} 题</span>`;
+                    buttonGroup += `
+                        <button class="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-red-600 active:scale-95 transition-transform" onclick="alert('📸 请拍照上传您的作业结果\\n系统将自动批改并收集错题')">  
+                            去批改/收集 (${lesson.problems}题)
+                        </button>
+                    `;
+                } else if (lesson.status === 'unassigned') {
+                    // 未分配，可自主收集
+                    mistakeInfo = `<span class="text-xs text-gray-400">${lesson.pages} | ${lesson.problems} 题</span>`;
+                    buttonGroup += `
+                        <button class="bg-primary-500 text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-primary-600 active:scale-95 transition-transform" onclick="alert('📸 请拍照上传您的作业结果\\n系统将自动批改并收集错题')">
+                            批改/收集
+                        </button>
+                    `;
+                }
+
+                // 优化：课时标题添加溢出处理
+                let primaryInfo = `<p class="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                    ${emotionalIcon} 
+                    <span class="lesson-title">${lesson.title}</span>
+                </p>`;
+
+                // 删除通用资源按钮
+                const utilityButtons = '';
+
+                const content = `
+                    <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100 ${lessonClass} mb-2">
+                        <div class="flex items-center justify-between gap-3">
+                            <!-- 左侧：状态图标 + 课时信息 -->
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                ${statusIcon}
+                                <div class="flex-1 min-w-0">
+                                    ${primaryInfo}
+                                    ${mistakeInfo}
+                                </div>
+                            </div>
+                            <!-- 右侧：操作按钮 -->
+                            <div class="flex gap-1.5 items-center flex-shrink-0">
+                                ${buttonGroup}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                lessonsContainer.insertAdjacentHTML('beforeend', content);
+            });
+            lucide.createIcons();
+        }
+
+        // 处理增强练习按钮点击 (Chapter Level)
+        function handleEnhancedPractice(chapterTitle, sets) {
+            const modalTitle = document.getElementById('enhanced-modal-title');
+            const setsList = document.getElementById('enhanced-sets-list');
+
+            modalTitle.textContent = `《${chapterTitle}》增强练习卷`;
+            setsList.innerHTML = '';
+
+            sets.forEach((setTitle, index) => {
+                const isRecommended = setTitle.includes('专家推荐');
+                const element = `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center flex-shrink-0 font-bold text-sm">
+                                ${String.fromCharCode(65 + index)}
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">${setTitle}</p>
+                                <p class="text-xs ${isRecommended ? 'text-orange-600' : 'text-gray-500'} flex items-center gap-1">
+                                    ${isRecommended ? '<i data-lucide="star" class="w-3.5 h-3.5 fill-orange-400 text-orange-400"></i>专家推荐' : '配套强化练习'}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="bg-white text-primary-500 text-xs font-bold px-3 py-1.5 rounded-full border border-primary-300 hover:bg-primary-100 active:scale-95 transition-transform" onclick="viewDetails('${chapterTitle}', 'download', '${setTitle}')">
+                                下载
+                            </button>
+                            <button class="bg-primary-500 text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-primary-600 active:scale-95 transition-transform" onclick="viewDetails('${chapterTitle}', 'view', '${setTitle}')">
+                                查看
+                            </button>
+                        </div>
+                    </div>
+                `;
+                setsList.insertAdjacentHTML('beforeend', element);
+            });
+            lucide.createIcons();
+            toggleEnhancedPracticeModal();
+        }
+
+        // 增强练习选择弹窗开关
+        function toggleEnhancedPracticeModal() {
+            document.getElementById('enhanced-practice-modal').classList.toggle('hidden');
+        }
+
+        // 个性化练习弹窗开关
+        function togglePersonalizedModal(lessonTitle) {
+            const modal = document.getElementById('personalized-modal');
+            if (lessonTitle) {
+                document.getElementById('personalized-target-title').textContent = lessonTitle;
+            }
+            modal.classList.toggle('hidden');
+        }
+
+        // 难度选择
+        function selectDifficulty(btn, level) {
+            const container = document.getElementById('difficulty-selector');
+            container.querySelectorAll('button').forEach(b => {
+                b.className = 'flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50';
+            });
+            btn.className = 'flex-1 py-2 rounded-lg border-primary-500 bg-primary-50 text-sm font-bold text-primary-600 ring-1 ring-primary-500';
+        }
+
+        // 题量选择
+        function selectCount(btn, count) {
+            const container = document.getElementById('count-selector');
+            container.querySelectorAll('button').forEach(b => {
+                b.className = 'flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50';
+            });
+            btn.className = 'flex-1 py-2 rounded-lg border-primary-500 bg-primary-50 text-sm font-bold text-primary-600 ring-1 ring-primary-500';
+        }
+
+        // 生成练习
+        function generatePractice(type) {
+            togglePersonalizedModal();
+            if (type === 'download') {
+                alert('正在为您生成个性化练习卷PDF，请稍候...');
+            } else {
+                alert('正在跳转至在线练习页面...');
+            }
+        }
+
+        // 教材切换弹窗开关
+        function toggleTextbookModal() {
+            document.getElementById('textbook-modal').classList.toggle('hidden');
+        }
+
+        // 选择教材
+        function selectTextbook(version) {
+            const currentGrade = document.getElementById('current-grade').textContent;
+            document.getElementById('current-version').textContent = version;
+        }
+
+        // 年级册别选择
+        function selectGrade(btn, grade) {
+            const container = document.getElementById('grade-selector');
+            container.querySelectorAll('button').forEach(b => {
+                b.className = 'p-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50';
+            });
+            btn.className = 'p-2 text-sm font-bold rounded-lg border-2 border-primary-500 bg-primary-50 text-primary-600';
+
+            document.getElementById('current-grade').textContent = grade;
+            toggleTextbookModal();
+            alert(`已切换至 ${version} ${currentGrade} 教材，正在刷新目录...`);
+        }
+
+        // 专栏总览弹窗开关
+        function toggleAnalyticsModal() {
+            document.getElementById('analytics-modal').classList.toggle('hidden');
+        }
+
+        // 学科切换逻辑
+        function switchSubject(btn, subject) {
+            document.querySelectorAll('#subject-switcher button').forEach(b => {
+                b.className = 'pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all';
+            });
+            btn.className = 'pb-2 border-b-2 border-primary-500 text-primary-500 font-bold text-base transition-all';
+            document.getElementById('current-subject-title').textContent = `九年级${subject}（下）`;
+            renderProgress();
+            renderLessons(false);
+        }
+
+        // 首次加载时渲染进度和列表
+        window.onload = function () {
+            renderProgress();
+            renderLessons(false);
+            lucide.createIcons();
+        }
+
+        // 教师任务筛选
+        function toggleFilter(btn) {
+            const isFiltered = btn.getAttribute('data-filtered') === 'false';
+            btn.setAttribute('data-filtered', isFiltered);
+
+            if (isFiltered) {
+                btn.classList.add('bg-primary-500', 'text-white');
+                btn.classList.remove('bg-gray-100', 'text-gray-600');
+            } else {
+                btn.classList.remove('bg-primary-500', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            }
+
+            renderLessons(isFiltered);
+        }
+
+
+
+        // 查看详情
+        function viewDetails(lesson, action, detail, isListening) {
+            if (!document.getElementById('enhanced-practice-modal').classList.contains('hidden')) {
+                toggleEnhancedPracticeModal();
+            }
+
+            if (action === 'report') {
+                alert(`[学情报告页面] 正在加载 ${lesson} 课时的学情报告。`);
+            } else if (action === 'personalized') {
+                // 这里的逻辑已经由 togglePersonalizedModal 接管，但为了兼容性保留
+                togglePersonalizedModal(lesson);
+            } else if (action === 'utility') {
+                if (isListening === 'true') {
+                    alert(`[听力播放器] 正在打开 ${lesson} 听力播放器。`);
+                } else {
+
+                    alert(`[答案解析页面] 正在加载 ${lesson} 课时的答案解析页面。`);
+                }
+            } else if (action === 'download') {
+                alert(`[下载提示] 正在下载 《${lesson}》 的 ${detail} 练习卷的PDF文件...`);
+            } else if (action === 'view') {
+                alert(`[增强练习在线查看] 正在加载 《${lesson}》 的 ${detail} 练习卷的在线查看页面...`);
+            }
+        }
+    </script>
+</body>
+
+</html>

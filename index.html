@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>作业评价(家长/学生端)</title>
+    <!-- Tailwind CSS -->
+    <script src="js/tailwind.min.js"></script>
+    <!-- Lucide -->
+    <script src="js/lucide.js"></script>
+    <!-- GSAP -->
+    <script src="js/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #10b981;
+            /* Emerald 500 */
+            --nav-height: 80px;
+            --nav-bg: #ffffff;
+            --nav-active: #10b981;
+            --nav-inactive: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Content Area */
+        #app-container {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .page-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .page-frame.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: relative;
+            height: var(--nav-height);
+            background: var(--nav-bg);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 50;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--nav-inactive);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            transition: color 0.3s;
+            width: 20%;
+            height: 100%;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: var(--nav-active);
+        }
+
+        .nav-item i {
+            margin-bottom: 4px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .nav-item.active i {
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        /* Center Button Special Styling */
+        .nav-item:nth-child(3) {
+            margin-top: -30px;
+            /* Lift it up */
+        }
+
+        .nav-item:nth-child(3) .icon-container {
+            background: var(--primary-color);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+            margin-bottom: 4px;
+            border: 4px solid #f8fafc;
+            /* Match body bg to fake the curve cut-out */
+        }
+
+        .nav-item:nth-child(3).active .icon-container {
+            background: #059669;
+            /* Darker green */
+            transform: scale(1.05);
+        }
+
+        .nav-item:nth-child(3) span {
+            margin-top: 4px;
+            /* Adjust text position */
+        }
+
+        /* Indicator Dot */
+        .nav-indicator {
+            position: absolute;
+            bottom: 8px;
+            width: 4px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .nav-item.active .nav-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Main Content Area (Iframes) -->
+    <div id="app-container">
+        <iframe id="page-home" class="page-frame active" src="jsx_home.html"></iframe>
+        <iframe id="page-homework" class="page-frame" src="jsx_basichomework.html"></iframe>
+        <iframe id="page-wrong" class="page-frame" src="jsx_wrong.html"></iframe>
+        <iframe id="page-practice" class="page-frame" src="jsx_record.html"></iframe>
+        <iframe id="page-profile" class="page-frame" src="jsx_userprofile.html"></iframe>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <!-- 1. 首页 -->
+        <div class="nav-item active" onclick="switchTab(0)">
+            <i data-lucide="home" width="24" height="24"></i>
+            <span>首页</span>
+            <div class="nav-indicator"></div>
+        </div>
+
+        <!-- 2. 基础性作业 -->
+        <div class="nav-item" onclick="switchTab(1)">
+            <i data-lucide="file-edit" width="24" height="24"></i>
+            <span>基础性作业</span>
+            <div class="nav-indicator"></div>
+        </div>
+
+        <!-- 3. 错题本 (Center Highlight) -->
+        <div class="nav-item" onclick="switchTab(2)">
+            <div class="icon-container">
+                <i data-lucide="book-x" width="28" height="28"></i>
+            </div>
+            <span>错题本</span>
+        </div>
+
+        <!-- 4. 精准练习 -->
+        <div class="nav-item" onclick="switchTab(3)">
+            <i data-lucide="target" width="24" height="24"></i>
+            <span>精准练习</span>
+            <div class="nav-indicator"></div>
+        </div>
+
+        <!-- 5. 我的 -->
+        <div class="nav-item" onclick="switchTab(4)">
+            <i data-lucide="user" width="24" height="24"></i>
+            <span>我的</span>
+            <div class="nav-indicator"></div>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        const tabs = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page-frame');
+
+        // Tab Configuration
+        // 0: Home, 1: Homework, 2: Wrong, 3: Practice, 4: Profile
+
+        function switchTab(index) {
+            // 1. Update Active State for Tabs
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+
+                    // GSAP Animation for the icon
+                    const icon = tab.querySelector('i');
+                    if (icon) {
+                        gsap.fromTo(icon,
+                            { scale: 0.8, y: 0 },
+                            { scale: 1.1, y: -5, duration: 0.3, ease: "back.out(1.7)", yoyo: true, repeat: 1 }
+                        );
+                    }
+
+                    // Special animation for center button
+                    if (i === 2) {
+                        const container = tab.querySelector('.icon-container');
+                        gsap.fromTo(container,
+                            { scale: 1 },
+                            { scale: 1.1, duration: 0.2, yoyo: true, repeat: 1 }
+                        );
+                    }
+
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // 2. Switch Pages
+            pages.forEach((page, i) => {
+                if (i === index) {
+                    page.classList.add('active');
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+        }
+
+        // 页面加载完成后检查URL参数
+        document.addEventListener('DOMContentLoaded', function () {
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTabParam = urlParams.get('activeTab');
+
+            // 如果有activeTab参数且是有效的数字
+            if (activeTabParam !== null && !isNaN(activeTabParam)) {
+                const tabIndex = parseInt(activeTabParam);
+
+                // 验证索引是否在有效范围内 (0-4 假设有5个tab)
+                if (tabIndex >= 0 && tabIndex < tabs.length) {
+                    console.log(`自动激活第${tabIndex + 1}个tab`);
+                    switchTab(tabIndex);
+
+                    // 可选：清理URL参数，美化地址栏
+                    history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    console.warn(`无效的tab索引: ${tabIndex}`);
+                }
+            }
+        });
+
+        // Listen for messages from iframes (to handle cross-origin/file protocol restrictions)
+        window.addEventListener('message', function (event) {
+            if (event.data && event.data.type === 'SWITCH_TAB') {
+                switchTab(event.data.index);
+            }
+        });
+    </script>
+</body>
+
+</html>

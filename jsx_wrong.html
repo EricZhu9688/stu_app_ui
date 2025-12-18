@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错题攻克中心</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .icon-small {
+            width: 1rem;
+            height: 1rem;
+            stroke-width: 2.5;
+        }
+
+        .icon-base {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal Animation */
+        .modal-enter {
+            animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes modalUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Hide scrollbar for clean UI */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .card-selected {
+            border-color: #09C0D7 !important;
+            box-shadow: 0 0 0 2px rgba(9, 192, 215, 0.2) !important;
+        }
+    </style>
+</head>
+
+<body class="p-0 m-0">
+
+    <div class="min-h-screen bg-gray-50 pb-24 max-w-md mx-auto shadow-2xl relative">
+
+        <!-- 1. 头部：战场仪表盘 -->
+        <div
+            class="bg-gradient-to-br from-[#09C0D7] to-[#06A2B5] text-white p-5 pt-8 rounded-b-[2rem] shadow-lg relative z-10">
+            <div class="flex justify-between items-center mb-6">
+                <!-- 学科筛选 (横向平铺) -->
+                <div class="flex items-center bg-white/20 p-1 rounded-full backdrop-blur-md"
+                    id="subject-tabs-container">
+                    <!-- 由 JS 渲染 -->
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('download-modal')"
+                        class="bg-white/20 p-2 rounded-full backdrop-blur-sm active:scale-95 transition-transform hover:bg-white/30">
+                        <i data-lucide="printer" class="icon-base"></i>
+                    </button>
+                    <button onclick="toggleModal('filter-modal')"
+                        class="bg-white/20 p-2 rounded-full backdrop-blur-sm active:scale-95 transition-transform hover:bg-white/30">
+                        <i data-lucide="sliders-horizontal" class="icon-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据概览 -->
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <div class="text-cyan-100 text-xs mb-1 font-medium">当前待消灭</div>
+                    <div class="text-4xl font-extrabold tracking-tight">57 <span
+                            class="text-sm font-normal opacity-80">题</span></div>
+                </div>
+                <div class="text-right">
+                    <div class="text-cyan-100 text-xs mb-1 font-medium">本周已攻克</div>
+                    <div class="flex items-center justify-end gap-1 font-bold text-xl text-yellow-300">
+                        <i data-lucide="zap" class="icon-base fill-yellow-300"></i> 12 题
+                    </div>
+                </div>
+            </div>
+
+            <!-- 进度条 -->
+            <div class="bg-black/20 h-2 rounded-full overflow-hidden flex shadow-inner">
+                <div class="w-[40%] bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)]"></div>
+                <div class="w-[60%] bg-green-400"></div>
+            </div>
+            <div class="flex justify-between text-[10px] mt-1.5 text-cyan-50 font-medium tracking-wide">
+                <span>待攻克 40%</span>
+                <span>已掌握 60%</span>
+            </div>
+        </div>
+
+        <!-- 2. 美化的 Tab 切换 -->
+        <div class="px-4 mt-5">
+            <div id="tab-container" class="flex bg-white rounded-xl p-1.5 shadow-sm border border-gray-100">
+                <!-- Tabs injected via JS -->
+            </div>
+        </div>
+
+        <!-- 3. 错题列表 -->
+        <div id="mistake-list" class="p-4 space-y-4 min-h-[300px]">
+            <!-- Cards injected via JS -->
+        </div>
+
+        <!-- 4. 底部悬浮按钮: 收集错题 (简化版) -->
+        <div class="fixed bottom-6 right-6 z-20">
+            <button onclick="collectWrong()"
+                class="bg-[#09C0D7] text-white w-14 h-14 rounded-full shadow-xl shadow-cyan-200 flex items-center justify-center active:scale-95 transition-transform hover:bg-[#08acc0] border-2 border-white/20">
+                <i data-lucide="camera" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- ================= 弹窗区域 ================= -->
+
+        <!-- A. 筛选弹窗 (Filter Modal) -->
+        <div id="filter-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onclick="toggleModal('filter-modal')"></div>
+            <div
+                class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0 h-[85vh] flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">筛选错题</h3>
+                    <button onclick="toggleModal('filter-modal')" class="text-gray-400 hover:text-gray-600"><i
+                            data-lucide="x" class="icon-base"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto scrollbar-hide space-y-8 pb-4">
+                    <!-- 1. 年级筛选 -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-[#09C0D7] rounded-full"></span> 年级
+                        </label>
+                        <div class="flex flex-wrap gap-2.5">
+                            <filter-chip label="一年级"></filter-chip>
+                            <filter-chip label="二年级"></filter-chip>
+                            <filter-chip label="三年级"></filter-chip>
+                            <filter-chip label="四年级"></filter-chip>
+                            <filter-chip label="五年级" active></filter-chip>
+                            <filter-chip label="六年级"></filter-chip>
+                            <filter-chip label="七年级"></filter-chip>
+                            <filter-chip label="八年级"></filter-chip>
+                            <filter-chip label="九年级"></filter-chip>
+                        </div>
+                    </div>
+
+                    <!-- 2. 错因记录 -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-[#09C0D7] rounded-full"></span> 错因记录
+                        </label>
+                        <div class="flex flex-wrap gap-2.5">
+                            <filter-chip label="审题不清"></filter-chip>
+                            <filter-chip label="概念未掌握"></filter-chip>
+                            <filter-chip label="运算错误"></filter-chip>
+                            <filter-chip label="没有思路"></filter-chip>
+                            <filter-chip label="马虎粗心"></filter-chip>
+                            <filter-chip label="公式记错"></filter-chip>
+                            <filter-chip label="书写不规范"></filter-chip>
+                        </div>
+                    </div>
+
+                    <!-- 3. 题型 -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-[#09C0D7] rounded-full"></span> 题型
+                        </label>
+                        <div class="flex flex-wrap gap-2.5">
+                            <filter-chip label="选择题" active></filter-chip>
+                            <filter-chip label="填空题" active></filter-chip>
+                            <filter-chip label="判断题"></filter-chip>
+                            <filter-chip label="计算题" active></filter-chip>
+                            <filter-chip label="解答题" active></filter-chip>
+                            <filter-chip label="应用题"></filter-chip>
+                            <filter-chip label="作文"></filter-chip>
+                        </div>
+                    </div>
+
+                    <!-- 4. 难度等级 -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-[#09C0D7] rounded-full"></span> 难度等级
+                        </label>
+                        <div class="flex flex-wrap gap-2.5">
+                            <filter-chip label="1星 (基础)"></filter-chip>
+                            <filter-chip label="2星 (简单)"></filter-chip>
+                            <filter-chip label="3星 (中等)" active></filter-chip>
+                            <filter-chip label="4星 (较难)"></filter-chip>
+                            <filter-chip label="5星 (困难)"></filter-chip>
+                        </div>
+                    </div>
+
+                    <!-- 5. 录入时间 -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-[#09C0D7] rounded-full"></span> 录入时间
+                        </label>
+                        <div class="flex flex-wrap gap-2.5">
+                            <filter-chip label="本周" active></filter-chip>
+                            <filter-chip label="本月"></filter-chip>
+                            <filter-chip label="近3个月"></filter-chip>
+                            <filter-chip label="本学期"></filter-chip>
+                            <filter-chip label="全部时间"></filter-chip>
+                            <filter-chip label="自定义日期"></filter-chip>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 mt-2 flex gap-3">
+                    <button
+                        class="flex-1 py-3.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-colors">重置</button>
+                    <button onclick="toggleModal('filter-modal')"
+                        class="flex-[2] py-3.5 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 hover:bg-[#08acc0] transition-colors">确认筛选
+                        (12)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- B. 下载打印弹窗 (Download Modal) -->
+        <div id="download-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onclick="toggleModal('download-modal')"></div>
+            <div
+                class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">生成练习卷</h3>
+                    <button onclick="toggleModal('download-modal')" class="text-gray-400 hover:text-gray-600"><i
+                            data-lucide="x" class="icon-base"></i></button>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- 试题选择 -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-bold text-gray-700">选择试题</span>
+                            <button class="text-xs text-[#09C0D7] font-bold">全选 (57)</button>
+                        </div>
+                        <div class="text-xs text-gray-500">已选中当前列表中的 <span class="font-bold text-gray-800">12</span> 道错题
+                        </div>
+                    </div>
+
+                    <!-- 导出设置 -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-bold text-gray-700">导出内容设置</label>
+
+                        <label class="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
+                            <span class="text-sm text-gray-600">仅包含原错题</span>
+                            <input type="checkbox" checked class="w-5 h-5 accent-[#09C0D7] rounded">
+                        </label>
+
+                        <label class="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-600">包含AI变式题</span>
+                                <span class="text-[10px] text-gray-400">每道错题生成同类题</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-500">x 1</span>
+                                <input type="checkbox" class="w-5 h-5 accent-[#09C0D7] rounded">
+                            </div>
+                        </label>
+
+                        <label class="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
+                            <span class="text-sm text-gray-600">包含解析与答案</span>
+                            <input type="checkbox" class="w-5 h-5 accent-[#09C0D7] rounded">
+                        </label>
+                    </div>
+
+                    <button onclick="toggleModal('download-modal'); window.parent.postMessage({
+                                type: 'SWITCH_TAB',
+                                index: 3
+                            }, '*');"
+                        class="w-full py-3.5 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 flex items-center justify-center gap-2">
+                        <i data-lucide="file-down" class="icon-small"></i> 立即导出 PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- C. AI 答疑弹窗 (AI QA Modal) -->
+        <div id="ai-qa-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onclick="toggleModal('ai-qa-modal')"></div>
+            <div
+                class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0 h-[70vh] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-indigo-100 p-2 rounded-full">
+                            <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">AI 答疑助手</h3>
+                    </div>
+                    <button onclick="toggleModal('ai-qa-modal')" class="text-gray-400 hover:text-gray-600"><i
+                            data-lucide="x" class="icon-base"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto scrollbar-hide space-y-4 bg-gray-50 rounded-xl p-4 mb-4">
+                    <!-- Chat Content -->
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="bot" class="w-4 h-4 text-indigo-600"></i>
+                        </div>
+                        <div
+                            class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-gray-700 leading-relaxed">
+                            你好！我是你的AI学习助手。关于这道题，你有什么想问的吗？我可以为你讲解知识点，或者举几个类似的例子。
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 flex-row-reverse">
+                        <div class="w-8 h-8 rounded-full bg-[#09C0D7] flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-xs font-bold">我</span>
+                        </div>
+                        <div
+                            class="bg-[#09C0D7] p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-white leading-relaxed">
+                            这道题我不太明白为什么选B，能详细讲讲吗？
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="bot" class="w-4 h-4 text-indigo-600"></i>
+                        </div>
+                        <div
+                            class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-gray-700 leading-relaxed">
+                            <p class="mb-2">好的，让我们来看看这道题。</p>
+                            <p class="mb-2">题目问的是"happy"（快乐）的同义词。</p>
+                            <ul class="list-disc pl-4 space-y-1 text-gray-600">
+                                <li><strong>A. Angry</strong> 意思是“生气的”</li>
+                                <li><strong>B. Glad</strong> 意思是“高兴的”，与 happy 同义</li>
+                                <li><strong>C. Sad</strong> 意思是“悲伤的”</li>
+                                <li><strong>D. Tired</strong> 意思是“疲惫的”</li>
+                            </ul>
+                            <p class="mt-2">所以正确答案是 B。记住了吗？Glad = Happy！</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <input type="text" placeholder="输入你的问题..."
+                        class="w-full py-3 pl-4 pr-12 rounded-xl border border-gray-200 focus:border-[#09C0D7] focus:ring-2 focus:ring-[#09C0D7]/20 outline-none transition-all">
+                    <button
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#09C0D7] text-white rounded-lg hover:bg-[#08acc0]">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Gemini API (Keep Mock for demo) ---
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // --- 数据: 增加更多字段 ---
+        const MOCK_MISTAKES = [
+            {
+                id: 1,
+                subject: '语文',
+                type: '判断题',
+                difficulty: 4,
+                status: 'new',
+                content: '我知道本文（《大青树下的小学》）第3自然段写的是同学们课上认真读书和课下尽情玩耍的场景。',
+                userAnswer: '√',
+                correctAnswer: '×',
+                reason: '概念未掌握', // 错因
+                errorRate: '85%',     // 出错率
+                analysis: '第3自然段主要描写了下课后的场景，课上的描写在第2自然段。此处是考察对课文段落主旨的理解。',
+                videoTitle: '关联微课：段落场景分析'
+            },
+            {
+                id: 2,
+                subject: '数学',
+                type: '计算题',
+                difficulty: 5,
+                status: 'new',
+                content: '计算 $ \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{6} $ 的结果，并写出主要步骤。',
+                userAnswer: '1',
+                correctAnswer: '1',
+                reason: '步骤遗漏',
+                errorRate: '60%',
+                analysis: '虽然结果正确，但未写出通分的步骤。正确的步骤应是 $\\frac{3}{6} + \\frac{2}{6} + \\frac{1}{6} = \\frac{6}{6} = 1$。',
+                videoTitle: '关联微课：分数加法与通分'
+            },
+            {
+                id: 3,
+                subject: '英语',
+                type: '选择题',
+                difficulty: 3,
+                status: 'mastered',
+                content: 'Which word means "happy"? A. Angry B. Glad C. Sad D. Tired',
+                userAnswer: 'A',
+                correctAnswer: 'B',
+                reason: '马虎粗心',
+                errorRate: '25%',
+                analysis: 'Glad (adj.) 意为高兴的，快乐的。A. Angry (生气的)；C. Sad (悲伤的)；D. Tired (疲惫的)。',
+                videoTitle: '关联微课：常用情绪形容词'
+            },
+            {
+                id: 4,
+                subject: '语文',
+                type: '填空题',
+                difficulty: 3,
+                status: 'new',
+                content: '看图填空：羊群 $\\to$ [      ] $\\to$ 白色的花',
+                img: 'https://placehold.co/300x100/e0f2f1/00796b?text=Diagram+Placeholder',
+                userAnswer: '草地',
+                correctAnswer: '白色的大花',
+                reason: '审题不清',
+                errorRate: '40%',
+                analysis: '根据课文比喻句“羊群一会儿上了小丘...像给无边的绿毯绣上了白色的大花”，本体是羊群，喻体是白色的大花。',
+                videoTitle: '关联微课：比喻句解析'
+            }
+        ];
+
+        let currentActiveTab = 'new';
+        let currentSubjectFilter = '语文'; // 默认第一个学科
+
+        // 状态颜色映射
+        const statusMap = {
+            new: { label: '待攻克', color: 'bg-red-50 text-red-600 border-red-100' },
+            mastered: { label: '已掌握', color: 'bg-green-50 text-green-600 border-green-100' }
+        };
+
+        // 错因颜色映射
+        const reasonColorMap = {
+            '概念未掌握': 'bg-purple-50 text-purple-600 border-purple-100',
+            '步骤遗漏': 'bg-orange-50 text-orange-600 border-orange-100',
+            '马虎粗心': 'bg-gray-50 text-gray-600 border-gray-200',
+            '审题不清': 'bg-blue-50 text-blue-600 border-blue-100',
+            'default': 'bg-gray-50 text-gray-500'
+        };
+
+        // --- 核心逻辑 ---
+
+        function generateDifficultyStars(difficulty) {
+            let starsHtml = '';
+            for (let i = 0; i < 5; i++) {
+                const colorClass = i < difficulty ? "text-orange-400 fill-orange-400" : "text-gray-200";
+                starsHtml += `<i data-lucide="star" class="icon-small ${colorClass}"></i>`;
+            }
+            return starsHtml;
+        }
+
+        function generateMistakeCard(data) {
+            const { id, subject, type, difficulty, status, content, img, userAnswer, correctAnswer, analysis, videoTitle, reason, errorRate } = data;
+            const statusInfo = statusMap[status];
+            const reasonClass = reasonColorMap[reason] || reasonColorMap['default'];
+
+            return `
+            <div id="card-${id}" onclick="window.location.href='jsx_wrong_detail.html?id=${id}'" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in relative group transition-all duration-200 cursor-pointer">
+                <!-- 卡片头部 -->
+                <div class="px-4 py-3 flex justify-between items-start border-b border-gray-50 bg-gray-50/30">
+                    <div class="flex gap-2 items-center">
+                        <span class="text-[10px] px-2 py-0.5 rounded-md border font-bold ${statusInfo.color}">
+                            ${statusInfo.label}
+                        </span>
+                        <span class="text-xs text-gray-500 font-medium">${subject} · ${type}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${errorRate}学生做错</span>
+                        <div class="flex gap-0.5">${generateDifficultyStars(difficulty)}</div>
+                    </div>
+                </div>
+
+                <!-- 题目内容区 -->
+                <div class="p-4">
+                    <div class="flex gap-2 mb-2 flex-wrap">
+                        <span class="text-[10px] px-2 py-0.5 rounded border ${reasonClass} font-medium">
+                           #${reason}
+                        </span>
+                    </div>
+                    <div class="text-sm text-gray-800 font-medium leading-relaxed">
+                        ${content}
+                    </div>
+                    
+                    ${img ? `<div class="mt-3 rounded-lg overflow-hidden border border-gray-100"><img src="${img}" class="w-full h-auto object-cover"></div>` : ''}
+
+                    <!-- 遮挡答案区 -->
+                    <div class="mt-4 relative">
+                        <div id="analysis-hidden-${id}">
+                            <button onclick="toggleAnalysis('${id}')" class="w-full py-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-xs flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition-colors active:scale-[.98]">
+                                <span class="font-bold text-gray-500">👀 思考一下</span>
+                                <span>点击查看解析与答案</span>
+                            </button>
+                        </div>
+
+                        <div id="analysis-visible-${id}" class="hidden fade-in">
+                            <div class="bg-cyan-50/40 rounded-xl p-3 border border-cyan-100/50">
+                                <div class="flex justify-between text-xs mb-2 pb-2 border-b border-cyan-100/50">
+                                    <span class="text-red-500 font-medium">❌ 你的答案: ${userAnswer}</span>
+                                    <span class="text-green-600 font-bold">✅ 正确答案: ${correctAnswer}</span>
+                                </div>
+                                <div class="text-xs text-gray-600 leading-relaxed mb-3">
+                                    <span class="font-bold text-[#09C0D7]">【解析】</span> ${analysis}
+                                </div>
+                                <div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 cursor-pointer hover:border-cyan-200">
+                                    <i data-lucide="play-circle" class="icon-base text-[#09C0D7]"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-800">${videoTitle}</div>
+                                        <div class="text-[10px] text-gray-400">03:45 · 320人学习</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 订正区 (新增功能) -->
+                            <div class="mt-3 flex gap-2">
+                                <button onclick="alert('调起相机订正'); event.stopPropagation();" class="flex-1 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 flex items-center justify-center gap-1.5 active:scale-95 transition-transform">
+                                    <i data-lucide="camera" class="icon-small"></i> 上传订正
+                                </button>
+                                <button onclick="toggleAnalysis('${id}', false)" class="px-3 text-xs text-gray-400 underline">收起</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部操作栏 -->
+                <div class="grid grid-cols-3 border-t border-gray-100 divide-x divide-gray-100 bg-gray-50/30">
+                    <button onclick="event.stopPropagation(); openAIQA('${id}')" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 active:bg-indigo-100 transition-colors">
+                        <i data-lucide="bot" class="icon-small"></i> AI 答疑
+                    </button>
+                    <button onclick="event.stopPropagation()" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-gray-600 hover:bg-gray-50 active:bg-gray-200 transition-colors">
+                        <i data-lucide="refresh-cw" class="icon-small text-orange-500"></i> 举一反三
+                    </button>
+                    <button onclick="event.stopPropagation()" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-[#09C0D7] hover:bg-cyan-50 active:bg-cyan-100 transition-colors">
+                        <i data-lucide="check-circle" class="icon-small"></i> 标记已掌握
+                    </button>
+                </div>
+            </div>
+        `;
+        }
+
+        function toggleAnalysis(id, show = true) {
+            event.stopPropagation();
+            const hidden = document.getElementById(`analysis-hidden-${id}`);
+            const visible = document.getElementById(`analysis-visible-${id}`);
+            if (show) {
+                hidden.classList.add('hidden');
+                visible.classList.remove('hidden');
+            } else {
+                hidden.classList.remove('hidden');
+                visible.classList.add('hidden');
+            }
+        }
+
+        function toggleSelection(id) {
+            const card = document.getElementById(`card-${id}`);
+            card.classList.toggle('card-selected');
+        }
+
+        function openAIQA(id) {
+            toggleModal('ai-qa-modal');
+        }
+
+        // --- 学科切换 Logic ---
+        function renderSubjectTabs() {
+            const container = document.getElementById('subject-tabs-container');
+            container.innerHTML = '';
+
+            const subjects = ['语文', '数学', '英语'];
+
+            subjects.forEach(sub => {
+                const isActive = sub === currentSubjectFilter;
+                const btn = document.createElement('button');
+                btn.textContent = sub;
+                btn.className = `px-4 py-1.5 rounded-full text-xs font-bold transition-all ${isActive
+                    ? 'bg-white text-[#09C0D7] shadow-md'
+                    : 'text-white/80 hover:bg-white/10'
+                    }`;
+                btn.onclick = () => {
+                    currentSubjectFilter = sub;
+                    renderSubjectTabs();
+                    renderMistakeList();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // --- Tab 渲染 (美化版) ---
+        function renderTabs() {
+            const tabContainer = document.getElementById('tab-container');
+            tabContainer.innerHTML = '';
+
+            const tabs = [
+                { id: 'new', label: '待攻克' },
+                { id: 'mastered', label: '已掌握' }
+            ];
+
+            tabs.forEach(tab => {
+                const isActive = tab.id === currentActiveTab;
+                const btn = document.createElement('button');
+                // Segmented Control Style
+                btn.className = `flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${isActive
+                    ? 'bg-[#09C0D7] text-white shadow-md shadow-cyan-100 scale-100'
+                    : 'text-gray-500 hover:bg-gray-50'
+                    }`;
+                btn.textContent = tab.label;
+                btn.onclick = () => {
+                    currentActiveTab = tab.id;
+                    renderTabs();
+                    renderMistakeList();
+                };
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        // --- 筛选与渲染逻辑 ---
+        // (applyFilters removed as we now use specific subject tabs logic)
+
+        function renderMistakeList() {
+            const listContainer = document.getElementById('mistake-list');
+            listContainer.innerHTML = '';
+
+            const filtered = MOCK_MISTAKES.filter(m => {
+                // Tab Filter
+                if (currentActiveTab === 'new' && m.status !== 'new') return false;
+                if (currentActiveTab === 'mastered' && m.status !== 'mastered') return false;
+
+                // Subject Filter (Strict)
+                if (m.subject !== currentSubjectFilter) return false;
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 text-gray-400">
+                    <i data-lucide="inbox" class="w-12 h-12 mb-2 opacity-50"></i>
+                    <p class="text-xs">暂无相关错题</p>
+                </div>
+            `;
+            } else {
+                filtered.forEach(item => {
+                    listContainer.insertAdjacentHTML('beforeend', generateMistakeCard(item));
+                });
+            }
+            lucide.createIcons();
+        }
+
+        // --- 弹窗逻辑 ---
+        window.toggleModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // 收集错题
+        function collectWrong() {
+            // 跳转到错题采集页
+            window.location.href = 'jsx_collect_wrong.html';
+        }
+
+        // --- Filter Chip Component Helper ---
+        class FilterChipElement extends HTMLElement {
+            connectedCallback() {
+                const label = this.getAttribute('label');
+                const active = this.hasAttribute('active');
+                this.innerHTML = `
+                <button class="px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${active
+                        ? 'bg-cyan-50 text-[#09C0D7] border-[#09C0D7]'
+                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                    }">
+                    ${label}
+                </button>
+            `;
+                this.querySelector('button').onclick = (e) => {
+                    // Simple toggle visual for demo
+                    const btn = e.target.closest('button');
+                    if (btn.classList.contains('bg-cyan-50')) {
+                        btn.className = 'px-3 py-1.5 rounded-full text-xs font-bold border transition-colors bg-white text-gray-500 border-gray-200 hover:border-gray-300';
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-full text-xs font-bold border transition-colors bg-cyan-50 text-[#09C0D7] border-[#09C0D7]';
+                    }
+                };
+            }
+        }
+        customElements.define('filter-chip', FilterChipElement);
+
+        // --- Init ---
+        window.onload = function () {
+            lucide.createIcons();
+            renderSubjectTabs();
+            renderTabs();
+            renderMistakeList();
+        };
+    </script>
+
+</body>
+
+</html>

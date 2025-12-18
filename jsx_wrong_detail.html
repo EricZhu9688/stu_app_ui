@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错题详情</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .icon-small {
+            width: 1rem;
+            height: 1rem;
+            stroke-width: 2.5;
+        }
+
+        .icon-base {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal Animation */
+        .modal-enter {
+            animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes modalUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Hide scrollbar for clean UI */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="p-0 m-0">
+
+    <div class="min-h-screen bg-gray-50 pb-24 max-w-md mx-auto shadow-2xl relative flex flex-col">
+
+        <!-- Header -->
+        <div class="bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-20">
+            <button onclick="history.back()"
+                class="p-2 rounded-full hover:bg-gray-100 active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="icon-base text-gray-700"></i>
+            </button>
+            <h1 class="text-lg font-bold text-gray-800">错题详情</h1>
+            <button onclick="toggleModal('feedback-modal')"
+                class="p-2 rounded-full hover:bg-gray-100 active:scale-95 transition-transform text-gray-400">
+                <i data-lucide="flag" class="icon-base"></i>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="detail-container">
+            <!-- Content injected via JS -->
+        </div>
+
+        <!-- Footer Navigation -->
+        <div
+            class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 p-4 flex justify-between items-center z-20">
+            <button onclick="prevQuestion()" id="btn-prev"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 font-bold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i data-lucide="chevron-left" class="icon-small"></i> 上一题
+            </button>
+            <span class="text-xs font-bold text-gray-400" id="page-indicator">1 / 4</span>
+            <button onclick="nextQuestion()" id="btn-next"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-[#09C0D7] font-bold hover:bg-cyan-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                下一题 <i data-lucide="chevron-right" class="icon-small"></i>
+            </button>
+        </div>
+
+        <!-- Feedback Modal -->
+        <div id="feedback-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onclick="toggleModal('feedback-modal')"></div>
+            <div
+                class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">题目反馈</h3>
+                    <button onclick="toggleModal('feedback-modal')" class="text-gray-400 hover:text-gray-600"><i
+                            data-lucide="x" class="icon-base"></i></button>
+                </div>
+                <div class="space-y-3 mb-6">
+                    <button
+                        class="w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-gray-100 font-medium text-sm text-gray-700">题干有误</button>
+                    <button
+                        class="w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-gray-100 font-medium text-sm text-gray-700">答案解析有误</button>
+                    <button
+                        class="w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-gray-100 font-medium text-sm text-gray-700">图片显示不清</button>
+                    <button
+                        class="w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-gray-100 font-medium text-sm text-gray-700">其他问题</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Tags Modal -->
+        <div id="tags-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onclick="toggleModal('tags-modal')"></div>
+            <div
+                class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">编辑错因标签</h3>
+                    <button onclick="toggleModal('tags-modal')" class="text-gray-400 hover:text-gray-600"><i
+                            data-lucide="x" class="icon-base"></i></button>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-6" id="tags-options">
+                    <!-- Options injected via JS -->
+                </div>
+                <button onclick="saveTags()"
+                    class="w-full py-3.5 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 hover:bg-[#08acc0] transition-colors">保存修改</button>
+            </div>
+        </div>
+
+        <!-- AI QA Modal -->
+        <div id="ai-qa-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onclick="toggleModal('ai-qa-modal')"></div>
+            <div
+                class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0 h-[70vh] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-indigo-100 p-2 rounded-full">
+                            <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">AI 答疑助手</h3>
+                    </div>
+                    <button onclick="toggleModal('ai-qa-modal')" class="text-gray-400 hover:text-gray-600"><i
+                            data-lucide="x" class="icon-base"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto scrollbar-hide space-y-4 bg-gray-50 rounded-xl p-4 mb-4">
+                    <!-- Chat Content -->
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="bot" class="w-4 h-4 text-indigo-600"></i>
+                        </div>
+                        <div
+                            class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-gray-700 leading-relaxed">
+                            你好！我是你的AI学习助手。关于这道题，你有什么想问的吗？我可以为你讲解知识点，或者举几个类似的例子。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <input type="text" placeholder="输入你的问题..."
+                        class="w-full py-3 pl-4 pr-12 rounded-xl border border-gray-200 focus:border-[#09C0D7] focus:ring-2 focus:ring-[#09C0D7]/20 outline-none transition-all">
+                    <button
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#09C0D7] text-white rounded-lg hover:bg-[#08acc0]">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Data ---
+        const MOCK_MISTAKES = [
+            {
+                id: 1,
+                subject: '语文',
+                type: '判断题',
+                difficulty: 4,
+                status: 'new',
+                content: '我知道本文（《大青树下的小学》）第3自然段写的是同学们课上认真读书和课下尽情玩耍的场景。',
+                userAnswer: '√',
+                correctAnswer: '×',
+                reason: '概念未掌握',
+                errorRate: '85%',
+                analysis: '第3自然段主要描写了下课后的场景，课上的描写在第2自然段。此处是考察对课文段落主旨的理解。',
+                videoTitle: '关联微课：段落场景分析',
+                source: '2024年上学期期中考试'
+            },
+            {
+                id: 2,
+                subject: '数学',
+                type: '计算题',
+                difficulty: 5,
+                status: 'new',
+                content: '计算 $ \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{6} $ 的结果，并写出主要步骤。',
+                userAnswer: '1',
+                correctAnswer: '1',
+                reason: '步骤遗漏',
+                errorRate: '60%',
+                analysis: '虽然结果正确，但未写出通分的步骤。正确的步骤应是 $\\frac{3}{6} + \\frac{2}{6} + \\frac{1}{6} = \\frac{6}{6} = 1$。',
+                videoTitle: '关联微课：分数加法与通分',
+                source: '第三单元课后练习'
+            },
+            {
+                id: 3,
+                subject: '英语',
+                type: '选择题',
+                difficulty: 3,
+                status: 'mastered',
+                content: 'Which word means "happy"? A. Angry B. Glad C. Sad D. Tired',
+                userAnswer: 'A',
+                correctAnswer: 'B',
+                reason: '马虎粗心',
+                errorRate: '25%',
+                analysis: 'Glad (adj.) 意为高兴的，快乐的。A. Angry (生气的)；C. Sad (悲伤的)；D. Tired (疲惫的)。',
+                videoTitle: '关联微课：常用情绪形容词',
+                source: '每日单词小测'
+            },
+            {
+                id: 4,
+                subject: '语文',
+                type: '填空题',
+                difficulty: 3,
+                status: 'new',
+                content: '看图填空：羊群 $\\to$ [      ] $\\to$ 白色的花',
+                img: 'https://placehold.co/300x100/e0f2f1/00796b?text=Diagram+Placeholder',
+                userAnswer: '草地',
+                correctAnswer: '白色的大花',
+                reason: '审题不清',
+                errorRate: '40%',
+                analysis: '根据课文比喻句“羊群一会儿上了小丘...像给无边的绿毯绣上了白色的大花”，本体是羊群，喻体是白色的大花。',
+                videoTitle: '关联微课：比喻句解析',
+                source: '第一单元复习卷'
+            }
+        ];
+
+        const ALL_TAGS = ['审题不清', '概念未掌握', '运算错误', '没有思路', '马虎粗心', '公式记错', '书写不规范', '步骤遗漏'];
+
+        let currentIndex = 0;
+
+        // --- Logic ---
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function init() {
+            const idParam = getQueryParam('id');
+            if (idParam) {
+                const index = MOCK_MISTAKES.findIndex(m => m.id == idParam);
+                if (index !== -1) {
+                    currentIndex = index;
+                }
+            }
+            renderDetail();
+        }
+
+        function generateDifficultyStars(difficulty) {
+            let starsHtml = '';
+            for (let i = 0; i < 5; i++) {
+                const colorClass = i < difficulty ? "text-orange-400 fill-orange-400" : "text-gray-200";
+                starsHtml += `<i data-lucide="star" class="icon-small ${colorClass}"></i>`;
+            }
+            return starsHtml;
+        }
+
+        function renderDetail() {
+            const data = MOCK_MISTAKES[currentIndex];
+            const container = document.getElementById('detail-container');
+
+            container.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+                    <!-- Meta Info -->
+                    <div class="px-4 py-3 flex justify-between items-start border-b border-gray-50 bg-gray-50/30">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex gap-2 items-center">
+                                <span class="text-xs font-bold text-[#09C0D7] bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-100">
+                                    ${data.subject}
+                                </span>
+                                <span class="text-xs text-gray-500 font-medium">${data.type}</span>
+                            </div>
+                            <div class="text-[10px] text-gray-400 flex items-center gap-1">
+                                <i data-lucide="folder" class="w-3 h-3"></i> 来源：${data.source}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${data.errorRate}学生做错</span>
+                            <div class="flex gap-0.5">${generateDifficultyStars(data.difficulty)}</div>
+                        </div>
+                    </div>
+
+                    <!-- Question Content -->
+                    <div class="p-5">
+                        <div class="text-base text-gray-800 font-medium leading-relaxed mb-4">
+                            ${data.content}
+                        </div>
+                        ${data.img ? `<div class="mb-4 rounded-lg overflow-hidden border border-gray-100"><img src="${data.img}" class="w-full h-auto object-cover"></div>` : ''}
+                        
+                        <!-- Tags Section -->
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="flex gap-2 flex-wrap" id="current-tags">
+                                <span class="text-xs px-2 py-1 rounded border bg-red-50 text-red-600 border-red-100 font-medium">
+                                   #${data.reason}
+                                </span>
+                            </div>
+                            <button onclick="openTagsModal()" class="p-1 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
+                                <i data-lucide="edit-2" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+
+                        <!-- Hidden Analysis Section -->
+                        <div class="mt-4 relative">
+                            <div id="analysis-hidden">
+                                <button onclick="toggleAnalysis(true)" class="w-full py-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition-colors active:scale-[.98]">
+                                    <span class="font-bold text-gray-500">👀 思考一下</span>
+                                    <span>点击查看解析与答案</span>
+                                </button>
+                            </div>
+
+                            <div id="analysis-visible" class="hidden fade-in">
+                                <div class="bg-cyan-50/40 rounded-xl p-4 border border-cyan-100/50">
+                                    <div class="flex justify-between text-sm mb-3 pb-3 border-b border-cyan-100/50">
+                                        <span class="text-red-500 font-medium">❌ 你的答案: ${data.userAnswer}</span>
+                                        <span class="text-green-600 font-bold">✅ 正确答案: ${data.correctAnswer}</span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 leading-relaxed mb-4">
+                                        <span class="font-bold text-[#09C0D7]">【解析】</span> ${data.analysis}
+                                    </div>
+                                    <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-cyan-200 transition-colors shadow-sm">
+                                        <div class="w-10 h-10 rounded-full bg-cyan-50 flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="play-circle" class="w-6 h-6 text-[#09C0D7]"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-gray-800">${data.videoTitle}</div>
+                                            <div class="text-xs text-gray-400 mt-0.5">03:45 · 320人学习</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 订正区 -->
+                                <div class="mt-3 flex gap-2">
+                                    <button onclick="alert('调起相机订正');" class="flex-1 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 flex items-center justify-center gap-1.5 active:scale-95 transition-transform">
+                                        <i data-lucide="camera" class="icon-small"></i> 上传订正
+                                    </button>
+                                    <button onclick="toggleAnalysis(false)" class="px-3 text-xs text-gray-400 underline">收起</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Actions -->
+                    <div class="grid grid-cols-3 border-t border-gray-100 divide-x divide-gray-100 bg-gray-50/30">
+                        <button onclick="openAIQA()" class="p-4 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 active:bg-indigo-100 transition-colors">
+                            <i data-lucide="bot" class="icon-small"></i> AI 答疑
+                        </button>
+                        <button onclick="alert('举一反三功能开发中...')" class="p-4 flex items-center justify-center gap-2 text-xs font-bold text-gray-600 hover:bg-gray-50 active:bg-gray-200 transition-colors">
+                            <i data-lucide="refresh-cw" class="icon-small text-orange-500"></i> 举一反三
+                        </button>
+                        <button onclick="markAsMastered()" class="p-4 flex items-center justify-center gap-2 text-xs font-bold text-[#09C0D7] hover:bg-cyan-50 active:bg-cyan-100 transition-colors">
+                            <i data-lucide="check-circle" class="icon-small"></i> 标记已掌握
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Update Navigation State
+            document.getElementById('page-indicator').textContent = `${currentIndex + 1} / ${MOCK_MISTAKES.length}`;
+            document.getElementById('btn-prev').disabled = currentIndex === 0;
+            document.getElementById('btn-next').disabled = currentIndex === MOCK_MISTAKES.length - 1;
+
+            lucide.createIcons();
+        }
+
+        function toggleAnalysis(show) {
+            const hidden = document.getElementById('analysis-hidden');
+            const visible = document.getElementById('analysis-visible');
+            if (show) {
+                hidden.classList.add('hidden');
+                visible.classList.remove('hidden');
+            } else {
+                hidden.classList.remove('hidden');
+                visible.classList.add('hidden');
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderDetail();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < MOCK_MISTAKES.length - 1) {
+                currentIndex++;
+                renderDetail();
+            }
+        }
+
+        function markAsMastered() {
+            MOCK_MISTAKES[currentIndex].status = 'mastered';
+            alert('已标记为“已掌握”！');
+            // In a real app, this would sync to the server or local storage
+        }
+
+        // --- Modal Logic ---
+        window.toggleModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openAIQA() {
+            toggleModal('ai-qa-modal');
+        }
+
+        // --- Tags Logic ---
+        function openTagsModal() {
+            const currentReason = MOCK_MISTAKES[currentIndex].reason;
+            const container = document.getElementById('tags-options');
+            container.innerHTML = '';
+
+            ALL_TAGS.forEach(tag => {
+                const isActive = tag === currentReason;
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${isActive
+                    ? 'bg-cyan-50 text-[#09C0D7] border-[#09C0D7]'
+                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                    }`;
+                btn.textContent = tag;
+                btn.onclick = () => {
+                    // Update local data
+                    MOCK_MISTAKES[currentIndex].reason = tag;
+                    // Re-render modal options to show selection
+                    openTagsModal();
+                };
+                container.appendChild(btn);
+            });
+
+            toggleModal('tags-modal');
+        }
+
+        function saveTags() {
+            renderDetail(); // Re-render main view to show new tag
+            toggleModal('tags-modal');
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+
+</html>

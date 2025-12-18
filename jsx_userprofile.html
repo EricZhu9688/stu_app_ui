@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 个性化学习导航仪</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="js/tailwind.min.js"></script>
+    <!-- 引入 Lucide Icons 库 -->
+    <script type="module">
+        import { createIcons, Award, Gem, BarChart3, BookOpenText, Target, Users, Settings, LogOut, ChevronRight, Zap, XCircle, User, PlusCircle, ArrowLeftRight, Link, ShieldCheck, Wallet } from 'https://unpkg.com/lucide@latest/dist/esm/lucide.js';
+
+        window.onload = () => {
+            createIcons({
+                icons: { Award, Gem, BarChart3, BookOpenText, Target, Users, Settings, LogOut, ChevronRight, Zap, XCircle, User, PlusCircle, ArrowLeftRight, Link, ShieldCheck, Wallet },
+                attrs: { class: 'lucide-icon' }
+            });
+        };
+    </script>
+
+    <style>
+        /* 引入中文字体支持 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@100..900&display=swap');
+
+        /* 定义主题色：#09c0d7 */
+        :root {
+            --font-main: 'Noto Sans SC', 'Inter', sans-serif;
+            --color-primary-hex: #09c0d7;
+            --color-primary-600: #0698ab;
+            --color-primary-500: #09c0d7;
+            --color-primary-500-10: rgba(9, 192, 215, 0.1);
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #f3f4f6;
+            /* gray-100 */
+        }
+
+        .interactive-button {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .interactive-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 自定义 Tailwind 颜色类 */
+        .bg-primary-500\/10 {
+            background-color: var(--color-primary-500-10);
+        }
+
+        .text-primary-600 {
+            color: var(--color-primary-600);
+        }
+
+        .bg-primary-500 {
+            background-color: var(--color-primary-500);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app" class="min-h-screen">
+        <!-- 顶栏 -->
+        <header class="sticky top-0 bg-white p-4 z-10 border-b shadow-sm">
+            <div class="flex justify-between items-center max-w-4xl mx-auto">
+                <h1 class="text-xl font-bold text-gray-800">个人中心</h1>
+                <button class="text-gray-600 p-2 rounded-full hover:bg-gray-100 interactive-button"
+                    onclick="handleNavigation('notificationCenter', '通知中心')">
+                    <svg class="lucide-icon w-5 h-5" data-lucide="zap"></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-4 max-w-4xl mx-auto space-y-8">
+
+            <!-- 1. 核心信息与 Dashboard 卡片区域 (动态内容) -->
+            <div id="userDashboard" class="bg-white p-6 rounded-3xl shadow-xl border border-gray-200">
+                <!-- 动态内容将由 JS 插入 -->
+            </div>
+
+            <!-- 2. 核心功能菜单区 (动态内容) -->
+            <div id="menuSections" class="space-y-8">
+                <!-- 动态菜单将由 JS 插入 -->
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 模态框结构 (用于所有交互反馈) -->
+    <div id="actionModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden"
+        onclick="closeModal()">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-11/12 max-w-md" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-800">操作确认</h3>
+                <button class="text-gray-400 hover:text-gray-600" onclick="closeModal()">
+                    <svg class="lucide-icon w-6 h-6" data-lucide="x-circle"></svg>
+                </button>
+            </div>
+            <p id="modalMessage" class="text-gray-700 mb-6 leading-relaxed">操作详情将在此显示。</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-full hover:bg-gray-300 transition">取消</button>
+                <button onclick="closeModal()"
+                    class="px-4 py-2 text-white font-semibold rounded-full hover:opacity-90 transition"
+                    style="background-color: var(--color-primary-500);">确认执行 / 进入页面</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 模拟数据和状态管理 ---
+
+        // 当前用户状态配置 (只需修改这三行来模拟不同场景)
+        let userState = {
+            isParent: true,      // true: 家长账号; false: 学生账号
+            currentUserId: 'P-20250001', // 当前登录账号的ID
+            currentContextId: 'S-20250912-101' // 当前查看的学生/自己的ID
+        };
+
+        // 绑定学生列表 (模拟)
+        const boundStudents = [
+            { id: 'S-20250912-101', name: '张小明' },
+            { id: 'S-20250912-102', name: '李华' }
+        ];
+
+        // 统一学生数据模型 (用于显示当前上下文的数据)
+        const studentData = {
+            'S-20250912-101': {
+                name: "张小明",
+                level: 3,
+                levelName: "进阶者",
+                xp: 850,
+                xpMax: 1000,
+                coins: 1200,
+                toBeConsolidatedErrors: 15, // 待巩固错题数量
+            },
+            'S-20250912-102': {
+                name: "李华",
+                level: 5,
+                levelName: "精英",
+                xp: 1500,
+                xpMax: 2000,
+                coins: 3500,
+                toBeConsolidatedErrors: 8,
+            }
+        };
+
+        // --- 通用 UI/交互 逻辑 ---
+
+        /**
+         * 显示自定义模态框
+         */
+        function showModal(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').innerHTML = message;
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        /**
+         * 关闭自定义模态框
+         */
+        function closeModal() {
+            document.getElementById('actionModal').classList.add('hidden');
+        }
+
+        /**
+         * 模拟页面跳转/功能执行，并显示模态框反馈
+         * @param {string} target 目标功能ID
+         * @param {string} name 目标功能名称
+         */
+        function handleNavigation(target, name) {
+            let message = '';
+
+            switch (target) {
+                case 'logout':
+                    message = `您确定要退出当前账号吗？`;
+                    break;
+                case 'switchContext':
+                    message = `正在切换到其他学生数据。`;
+                    break;
+                case 'bindStudent':
+                    message = `您即将进入学生绑定流程。`;
+                    break;
+                case 'accountSettings':
+                    const roleName = userState.isParent ? '家长' : '学生';
+                    message = `您即将进入 **${roleName}账号** 的设置页面，管理个人信息和安全。`;
+                    break;
+                case 'studentManagement':
+                    message = `您即将进入学生账号管理页面，可以绑定或解绑学生。`;
+                    break;
+                default:
+                    // 遵循核心功能两步内完成原则：点击即为第一步，模态框反馈/确认进入页面即为第二步
+                    message = `您即将进入 **${name}** 页面。在实际应用中，点击后将直接进入该功能界面，以确保核心功能在两步内完成。`;
+            }
+
+            showModal(name, message);
+        }
+
+        /**
+         * 切换当前查看的学生上下文
+         * @param {string} newId 学生的ID
+         */
+        function switchContext(newId) {
+            userState.currentContextId = newId;
+            // 实际应用中，这里会重新加载该学生的数据
+            showModal('切换成功', `成功切换到学生：**${studentData[newId].name}** 的数据上下文。`);
+            renderAll();
+        }
+
+        // --- 视图渲染逻辑 ---
+
+        /**
+         * 渲染核心仪表盘区域
+         */
+        function renderDashboard() {
+            const dashboardContainer = document.getElementById('userDashboard');
+            const primaryColor = 'var(--color-primary-500)';
+            let htmlContent = '';
+
+            if (userState.isParent && boundStudents.length === 0) {
+                // 场景 1: 家长未绑定学生
+                htmlContent = `
+                    <div class="text-center p-4">
+                        <svg class="lucide-icon w-10 h-10 mx-auto text-gray-400 mb-3" data-lucide="shield-check"></svg>
+                        <p class="text-xl font-semibold text-gray-800 mb-2">欢迎，亲爱的家长！</p>
+                        <p class="text-gray-600 mb-6">绑定学生账号后，即可查看孩子的个性化学习报告。</p>
+                        <button onclick="handleNavigation('bindStudent', '绑定学生')" class="px-6 py-3 text-white font-semibold rounded-full interactive-button shadow-lg shadow-primary-500/30" style="background-color: ${primaryColor};">
+                            <div class="flex items-center space-x-2">
+                                <svg class="lucide-icon w-5 h-5" data-lucide="plus-circle"></svg>
+                                <span>立即绑定学生</span>
+                            </div>
+                        </button>
+                    </div>
+                `;
+            } else {
+                // 场景 2: 学生本人 或 家长已绑定学生
+                const currentData = studentData[userState.currentContextId] || { name: "未知用户", level: 0, levelName: "待激活", xp: 0, xpMax: 100, coins: 0, toBeConsolidatedErrors: 0 };
+                const percentage = (currentData.xp / currentData.xpMax) * 100;
+
+                let profileHeader;
+                if (userState.isParent) {
+                    // 家长多学生切换器
+                    const studentOptions = boundStudents.map(s => `
+                        <option value="${s.id}" ${s.id === userState.currentContextId ? 'selected' : ''}>
+                            ${s.name} (${s.id.slice(-4)})
+                        </option>
+                    `).join('');
+
+                    profileHeader = `
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <svg class="lucide-icon w-7 h-7 text-gray-600" data-lucide="user"></svg>
+                                <span class="text-lg font-semibold text-gray-700">管理对象：</span>
+                            </div>
+                            <div class="relative w-1/2 md:w-1/3">
+                                <select onchange="switchContext(this.value)" 
+                                    class="block w-full py-2 pl-3 pr-10 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-lg text-sm appearance-none cursor-pointer"
+                                >
+                                    ${studentOptions}
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="lucide-icon w-4 h-4" data-lucide="arrow-left-right"></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-extrabold text-gray-900 mb-4">${currentData.name} 的学习概览</p>
+                    `;
+                } else {
+                    // 学生本人信息
+                    profileHeader = `
+                        <div class="flex items-center space-x-4 mb-4">
+                            <!-- 头像 Placeholder -->
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0" style="background-color: ${primaryColor};">
+                                ${currentData.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="text-2xl font-extrabold text-gray-900">${currentData.name}</p>
+                                <p class="text-sm text-gray-500">学习 ID: <span id="userId">${userState.currentContextId}</span></p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                htmlContent = `
+                    <!-- 动态头部/切换器 -->
+                    ${profileHeader}
+                    
+                    <!-- 学习指标卡片 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- 等级/XP 进度 -->
+                        <div class="p-4 rounded-xl shadow-inner border" style="background-color: var(--color-primary-500-10);">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <svg class="lucide-icon w-5 h-5 text-primary-600" data-lucide="award" style="color: var(--color-primary-600);"></svg>
+                                <p class="text-sm font-bold text-primary-600" style="color: var(--color-primary-600);">L${currentData.level} ${currentData.levelName}</p>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-1">经验值: <span>${currentData.xp}</span>/<span>${currentData.xpMax}</span></p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="h-2.5 rounded-full transition-all duration-500" style="width: ${percentage}%; background-color: ${primaryColor};"></div>
+                            </div>
+                        </div>
+
+                        <!-- 学习币/待巩固错题 -->
+                        <div class="p-4 rounded-xl shadow-inner border bg-yellow-500/10">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <svg class="lucide-icon w-5 h-5 text-red-600" data-lucide="book-open-text"></svg>
+                                <p class="text-sm font-bold text-red-600">待巩固错题</p>
+                            </div>
+                            <p class="text-2xl font-extrabold text-red-700">${currentData.toBeConsolidatedErrors}</p>
+                            <button onclick="handleNavigation('errorBook', 'AI错题本')" class="text-xs text-primary-600 hover:underline mt-1" style="color: var(--color-primary-600);">
+                                立即生成专属练习
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            dashboardContainer.innerHTML = htmlContent;
+        }
+
+        /**
+         * 获取当前角色对应的菜单数据
+         */
+        function getMenuSections() {
+            const isParent = userState.isParent;
+            let sections = [];
+
+            // 1. 核心学习功能 (对学生和家长都重要)
+            sections.push({
+                title: "核心学习服务",
+                icon: 'target',
+                color: 'text-indigo-500',
+                items: [
+                    // 错题本 (核心功能)
+                    {
+                        name: isParent ? "错题分析与打印" : "AI 错题本",
+                        icon: 'book-open-text',
+                        color: 'text-red-500',
+                        target: 'errorBook',
+                        badge: true,
+                        value: (studentData[userState.currentContextId]?.toBeConsolidatedErrors || 0) + ' 题待巩固'
+                    },
+                    // 报告
+                    {
+                        name: isParent ? "学生学习报告" : "我的学习报告",
+                        icon: 'bar-chart-3',
+                        color: 'text-blue-500',
+                        target: 'reportCenter'
+                    },
+                    // 任务
+                    {
+                        name: "专属任务历史",
+                        icon: 'target',
+                        color: 'text-green-500',
+                        target: 'taskHistory'
+                    },
+                ]
+            });
+
+            // 2. 激励与积分中心 (主要面向学生，但家长也有管理需求)
+            sections.push({
+                title: "激励与资产",
+                icon: 'gem',
+                color: 'text-yellow-500',
+                items: [
+                    { name: "我的学习币", icon: 'wallet', color: 'text-yellow-500', target: 'coinCenter', badge: !isParent, value: isParent ? '查看兑换记录' : studentData[userState.currentContextId]?.coins + ' 个' },
+                ]
+            });
+
+            // 3. 账户管理 (家长专属功能)
+            if (isParent) {
+                sections.push({
+                    title: "亲属与账户管理",
+                    icon: 'users',
+                    color: 'text-purple-500',
+                    items: [
+                        { name: "亲属账号管理", icon: 'users', color: 'text-purple-500', target: 'studentManagement', badge: true, value: boundStudents.length + ' 个已绑定' },
+                        { name: "账号与安全设置", icon: 'settings', color: 'text-gray-500', target: 'accountSettings' },
+                    ]
+                });
+            } else {
+                // 4. 账户管理 (学生本人)
+                sections.push({
+                    title: "个人与账户设置",
+                    icon: 'settings',
+                    color: 'text-gray-500',
+                    items: [
+                        { name: "账号与安全设置", icon: 'settings', color: 'text-gray-500', target: 'accountSettings' },
+                    ]
+                });
+            }
+
+            // 5. 通用操作
+            sections.push({
+                title: "通用操作",
+                icon: 'log-out',
+                color: 'text-gray-500',
+                items: [
+                    { name: "退出登录", icon: 'log-out', color: 'text-gray-500', target: 'logout' },
+                ]
+            });
+
+            return sections;
+        }
+
+        /**
+         * 渲染单个菜单项的 HTML 结构
+         */
+        function renderMenuItem(item) {
+            let badgeHtml = '';
+
+            if (item.badge) {
+                let badgeColorClass = item.target === 'errorBook' ? 'bg-red-100 text-red-600' : 'bg-primary-500/10 text-primary-600';
+                badgeHtml = `<span class="px-2 py-0.5 text-xs rounded-full font-bold ${badgeColorClass}" style="background-color: ${item.target === 'errorBook' ? '' : 'var(--color-primary-500-10)'}; color: ${item.target === 'errorBook' ? '' : 'var(--color-primary-600)'};">${item.value}</span>`;
+            }
+
+            return `
+                <button
+                    onclick="handleNavigation('${item.target}', '${item.name}')"
+                    class="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-lg transition duration-200 interactive-button w-full border border-gray-100"
+                >
+                    <div class="flex items-center space-x-4">
+                        <div class="p-2 rounded-full flex-shrink-0" style="background-color: ${item.color.replace('text-', 'bg-')}/10;">
+                            <svg class="lucide-icon w-5 h-5 ${item.color}" data-lucide="${item.icon}" style="color: ${item.color.replace('text-', '#')};"></svg>
+                        </div>
+                        <span class="text-base font-medium text-gray-800 text-left">${item.name}</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        ${badgeHtml}
+                        <svg class="lucide-icon w-5 h-5 text-gray-400" data-lucide="chevron-right"></svg>
+                    </div>
+                </button>
+            `;
+        }
+
+        /**
+         * 渲染整个菜单区块的 HTML 结构
+         */
+        function renderMenuSection(section) {
+            const itemsHtml = section.items.map(renderMenuItem).join('');
+
+            return `
+                <section class="space-y-3">
+                    <h2 class="text-lg font-bold text-gray-700 flex items-center space-x-2 pt-4">
+                        <svg class="lucide-icon w-5 h-5 ${section.color}" data-lucide="${section.icon}" style="color: ${section.color.replace('text-', '#')};"></svg>
+                        <span>${section.title}</span>
+                    </h2>
+                    <div class="space-y-3">
+                        ${itemsHtml}
+                    </div>
+                </section>
+            `;
+        }
+
+        /**
+         * 主渲染函数
+         */
+        function renderAll() {
+            // 1. 渲染 Dashboard
+            renderDashboard();
+
+            // 2. 渲染菜单
+            const menuData = getMenuSections();
+            const menuHtml = menuData.map(renderMenuSection).join('');
+            document.getElementById('menuSections').innerHTML = menuHtml;
+        }
+
+        // 页面加载完成后执行渲染逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 模拟场景设置 (可修改此处来测试不同角色) ---
+
+            // 测试场景 1: 学生本人 (isParent: false)
+            // userState.isParent = false;
+            // userState.currentContextId = 'S-20250912-101'; 
+
+            // 测试场景 2: 家长已绑定学生 (isParent: true, boundStudents.length > 0)
+            // userState.isParent = true; 
+            // userState.currentContextId = 'S-20250912-101'; // 默认选中张小明
+
+            // 测试场景 3: 家长未绑定学生 (isParent: true, boundStudents.length = 0)
+            // userState.isParent = true;
+            // boundStudents.length = 0;
+
+            renderAll();
+        });
+    </script>
+</body>
+
+</html>
