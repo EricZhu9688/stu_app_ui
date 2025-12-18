@@ -68,10 +68,14 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-2 relative z-10">
-            <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+            <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10 relative overflow-hidden">
                 <div class="text-cyan-100 text-xs mb-1">错题组卷 (PDF)</div>
-                <div class="text-2xl font-bold flex items-end gap-1">
+                <div class="text-2xl font-bold flex items-end gap-1 relative z-10">
                     8 <span class="text-sm font-normal opacity-70 mb-1">份</span>
+                </div>
+                <!-- Knowledge Point Badge -->
+                <div class="absolute right-2 bottom-4 bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] text-white font-medium border border-white/10">
+                    知识点: 17
                 </div>
             </div>
             <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
@@ -84,12 +88,7 @@
     </div>
 
     <!-- 2. 内容列表区域 (合并后) -->
-    <div class="px-4 mt-6 mb-4 flex justify-between items-center">
-        <h2 class="font-bold text-gray-800 text-lg">练习记录</h2>
-        <span class="text-xs text-gray-400">共 12 条记录</span>
-    </div>
-
-    <div class="px-4 space-y-4 min-h-[400px]" id="list-content">
+    <div class="px-4 mt-6 space-y-4 min-h-[400px]" id="list-content">
 
         <!-- 列表 A: 错题组卷 (PDF History) -->
             <!-- Card 1: 语文 (Red) -->
@@ -640,9 +639,9 @@
                 }
             });
 
-            // Update count
-            const countEl = document.querySelector('.text-gray-400');
-            if(countEl) countEl.textContent = `共 ${count} 条记录`;
+            // Update count (Removed)
+            // const countEl = document.querySelector('.text-gray-400');
+            // if(countEl) countEl.textContent = `共 ${count} 条记录`;
         }
 
         // Initialize filter on load
