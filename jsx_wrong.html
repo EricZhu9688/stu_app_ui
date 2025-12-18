@@ -557,7 +557,7 @@
                     <button onclick="event.stopPropagation(); openAIQA('${id}')" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 active:bg-indigo-100 transition-colors">
                         <i data-lucide="bot" class="icon-small"></i> AI 答疑
                     </button>
-                    <button onclick="event.stopPropagation()" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-gray-600 hover:bg-gray-50 active:bg-gray-200 transition-colors">
+                    <button onclick="event.stopPropagation(); previewPaper()" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-gray-600 hover:bg-gray-50 active:bg-gray-200 transition-colors">
                         <i data-lucide="refresh-cw" class="icon-small text-orange-500"></i> 举一反三
                     </button>
                     <button onclick="event.stopPropagation()" class="p-3 flex items-center justify-center gap-2 text-xs font-bold text-[#09C0D7] hover:bg-cyan-50 active:bg-cyan-100 transition-colors">
@@ -683,6 +683,12 @@
             } else {
                 modal.classList.add('hidden');
             }
+        }
+
+        // 举一反三
+        function previewPaper() {
+            // 跳转到举一反三页面
+            window.location.href = 'jsx_paper_preview.html';
         }
 
         // 收集错题

@@ -670,6 +670,39 @@
         });
         lucide.createIcons();
     </script>
+    <!-- Navigation Logic Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('#list-content > div');
+            
+            cards.forEach(card => {
+                // Make card appear clickable
+                card.classList.add('cursor-pointer', 'transition-transform', 'hover:scale-[1.01]');
+                
+                card.addEventListener('click', (e) => {
+                    // Prevent navigation if clicking a button
+                    if (e.target.closest('button')) {
+                        return;
+                    }
+
+                    // Determine state based on card content
+                    let state = 'graded'; // Default
+                    const textContent = card.innerText;
+
+                    if (textContent.includes('未开始')) {
+                        state = 'uncollected';
+                    } else if (textContent.includes('作答中')) {
+                        state = 'grading';
+                    } else if (textContent.includes('已批阅') || textContent.includes('重新导出 PDF')) {
+                        state = 'graded';
+                    }
+
+                    // Navigate
+                    window.location.href = `jsx_homework_dedtail.html?state=${state}`;
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
