@@ -804,7 +804,7 @@
             }
 
             if (action === 'report') {
-                alert(`[学情报告页面] 正在加载 ${lesson} 课时的学情报告。`);
+                window.location.href = 'jsx_homework_report.html';
             } else if (action === 'personalized') {
                 // 这里的逻辑已经由 togglePersonalizedModal 接管，但为了兼容性保留
                 togglePersonalizedModal(lesson);

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学情报告 - 智慧学习导航仪</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <!-- ECharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-cyan: #09C0D7;
+            --bg-gray: #f5f7fa;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+        }
+
+        .header-bg {
+            background: linear-gradient(180deg, #4DD0E1 0%, #09C0D7 100%);
+            padding-bottom: 5rem;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 250px;
+        }
+    </style>
+</head>
+
+<body class="pb-10">
+
+    <!-- Header -->
+    <header class="header-bg pt-6 px-4 text-white relative">
+        <div class="flex items-center justify-between mb-6">
+            <button onclick="history.back()" class="p-2 bg-white/20 backdrop-blur-sm rounded-full active:scale-95 transition-transform">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-lg font-bold">作业学情</h1>
+            <div class="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                <div class="w-[1px] h-4 bg-white/40"></div>
+                <i data-lucide="minus" class="w-5 h-5"></i>
+                <div class="w-[1px] h-4 bg-white/40"></div>
+                <i data-lucide="circle-dot" class="w-5 h-5"></i>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 px-2">
+            <div class="w-14 h-14 rounded-full bg-yellow-200 border-2 border-white overflow-hidden">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="w-full h-full">
+            </div>
+            <div>
+                <h2 class="text-xl font-bold">张小明</h2>
+                <p class="text-sm opacity-90 flex items-center gap-2">
+                    <span>2025-11-06</span>
+                    <span>周四</span>
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-4 -mt-16 relative z-10">
+        <!-- Info Card -->
+        <div class="bg-white rounded-3xl p-5 card-shadow mb-6">
+            <div class="flex items-start gap-3 mb-4">
+                <div class="w-10 h-10 bg-cyan-50 text-[#09C0D7] rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    数学
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 mb-0.5">基础性作业数学六年级上册</p>
+                    <h3 class="text-lg font-bold text-gray-800">课时 1 分数乘整数</h3>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                <button class="flex-1 py-2 bg-[#09C0D7] text-white rounded-lg text-sm font-bold shadow-sm transition-all">报告</button>
+                <button class="flex-1 py-2 text-gray-500 rounded-lg text-sm font-bold hover:bg-white/50 transition-all">错题</button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="mb-6">
+                <h4 class="font-bold text-gray-800 mb-4">作业成绩</h4>
+                <div class="grid grid-cols-4 gap-2 text-center">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">得分率</p>
+                        <div class="text-xl font-bold text-gray-800 mb-1">91<span class="text-xs font-normal">%</span></div>
+                        <div class="flex items-center justify-center text-[10px] text-green-500 bg-green-50 rounded-full px-1 py-0.5 mx-auto w-fit">
+                            <i data-lucide="arrow-up" class="w-3 h-3"></i> 87%
+                        </div>
+                        <p class="text-[10px] text-gray-300 mt-1">班级平均</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">成绩排名</p>
+                        <div class="text-xl font-bold text-gray-800 mb-1">1</div>
+                        <div class="text-[10px] text-gray-300 mt-2">--</div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">进/退步率</p>
+                        <div class="text-xl font-bold text-gray-800 mb-1">0.95<span class="text-xs font-normal">%</span></div>
+                        <div class="text-[10px] text-gray-300 mt-2">--</div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">作业用时</p>
+                        <div class="text-xl font-bold text-gray-800 mb-1">25<span class="text-xs font-normal">min</span></div>
+                        <div class="text-[10px] text-gray-500 mt-2">30min</div>
+                        <p class="text-[10px] text-gray-300 mt-1">班级平均</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completion -->
+            <div class="flex items-center gap-3 mb-2">
+                <span class="text-xs text-gray-400">完成度</span>
+                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-[#09C0D7] w-full rounded-full"></div>
+                </div>
+                <span class="text-lg font-bold text-gray-800">100<span class="text-xs font-normal">%</span></span>
+            </div>
+        </div>
+
+        <!-- Score Trend Chart -->
+        <div class="bg-white rounded-3xl p-5 card-shadow mb-6">
+            <h4 class="font-bold text-gray-800 mb-4">作业成绩变化</h4>
+            <div id="scoreTrendChart" class="chart-container"></div>
+        </div>
+
+        <!-- Time Trend Chart -->
+        <div class="bg-white rounded-3xl p-5 card-shadow mb-6">
+            <h4 class="font-bold text-gray-800 mb-4">作业用时变化 <i data-lucide="info" class="w-3 h-3 text-gray-300 inline"></i></h4>
+            <div id="timeTrendChart" class="chart-container"></div>
+        </div>
+
+        <!-- Question Type Analysis -->
+        <div class="bg-white rounded-3xl p-5 card-shadow mb-6">
+            <h4 class="font-bold text-gray-800 mb-4">错题类型分布 <i data-lucide="info" class="w-3 h-3 text-gray-300 inline"></i></h4>
+            <div id="typeAnalysisChart" class="chart-container"></div>
+        </div>
+
+        <!-- Knowledge Points Analysis -->
+        <div class="bg-white rounded-3xl p-5 card-shadow mb-6">
+            <h4 class="font-bold text-gray-800 mb-4">知识点掌握情况</h4>
+            <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 text-xs font-bold text-gray-600 text-right">分数乘法</div>
+                    <div class="flex-1">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-green-500 w-[95%] rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="w-8 text-xs font-bold text-green-600">掌握</div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 text-xs font-bold text-gray-600 text-right">约分</div>
+                    <div class="flex-1">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-yellow-400 w-[70%] rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="w-8 text-xs font-bold text-yellow-500">良好</div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 text-xs font-bold text-gray-600 text-right">应用题</div>
+                    <div class="flex-1">
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-red-400 w-[45%] rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="w-8 text-xs font-bold text-red-500">薄弱</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Analysis -->
+        <div class="bg-white rounded-3xl p-5 card-shadow mb-6">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="bot" class="w-5 h-5 text-[#09C0D7]"></i>
+                <h4 class="font-bold text-gray-800">AI 学情总结建议</h4>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2 text-sm border-l-4 border-[#09C0D7] pl-2">作业表现分析</h5>
+                    <p class="text-sm text-gray-600 leading-relaxed text-justify">
+                        张小明在本次数学作业上得分率达91%，成绩排名班级第一且有进步，整体表现出色。常见错误集中在<span class="text-red-500 font-bold">应用题</span>和<span class="text-orange-500 font-bold">计算题</span>。应用题错误可能反映对部分数量关系理解不透彻，计算题错误可能是粗心或约分不熟练。建议针对错题深入分析，强化相关知识点。
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2 text-sm border-l-4 border-green-500 pl-2">学习态度与习惯建议</h5>
+                    <p class="text-sm text-gray-600 leading-relaxed text-justify">
+                        从成绩看学习态度良好，但仍可进一步提升。可制定每日学习小目标，如每天花15-20分钟专门练习计算题以提高准确率，培养专注习惯。设置学习奖励机制，完成目标给予小奖励，提升学习动力。
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2 text-sm border-l-4 border-yellow-500 pl-2">学科辅导建议</h5>
+                    <p class="text-sm text-gray-600 leading-relaxed text-justify">
+                        针对薄弱题型，可购买如《小学数学应用题专项训练》、《小学数学计算能手》等辅导资料，进行专项练习。也可利用平台"拍照答疑"功能，遇到难题及时查看详细解析和视频讲解。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Chart 1: Score Trend
+        const scoreChart = echarts.init(document.getElementById('scoreTrendChart'));
+        const scoreOption = {
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['张小明', '班级平均'], bottom: 0 },
+            grid: { top: '10%', left: '3%', right: '4%', bottom: '15%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['课时3', '课时2', '课时1', '课时3', '课时1'], // Mock data labels
+                axisLine: { lineStyle: { color: '#ddd' } },
+                axisLabel: { color: '#666' }
+            },
+            yAxis: {
+                type: 'value',
+                max: 100,
+                splitLine: { lineStyle: { color: '#f0f0f0' } }
+            },
+            series: [
+                {
+                    name: '张小明',
+                    type: 'line',
+                    smooth: true,
+                    data: [85, 92, 88, 75, 91],
+                    itemStyle: { color: '#09C0D7' },
+                    lineStyle: { width: 3 },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(9, 192, 215, 0.3)' },
+                            { offset: 1, color: 'rgba(9, 192, 215, 0.0)' }
+                        ])
+                    }
+                },
+                {
+                    name: '班级平均',
+                    type: 'line',
+                    smooth: true,
+                    data: [80, 85, 82, 78, 87],
+                    itemStyle: { color: '#F87171' },
+                    lineStyle: { width: 2, type: 'dashed' }
+                }
+            ]
+        };
+        scoreChart.setOption(scoreOption);
+
+        // Chart 2: Time Trend
+        const timeChart = echarts.init(document.getElementById('timeTrendChart'));
+        const timeOption = {
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['张小明', '班级平均'], bottom: 0 },
+            grid: { top: '10%', left: '3%', right: '4%', bottom: '15%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                data: ['课时3', '课时2', '课时1', '课时3', '课时1'],
+                axisLine: { lineStyle: { color: '#ddd' } },
+                axisLabel: { color: '#666' }
+            },
+            yAxis: {
+                type: 'value',
+                name: '时长/min',
+                splitLine: { lineStyle: { color: '#f0f0f0' } }
+            },
+            series: [
+                {
+                    name: '张小明',
+                    type: 'bar',
+                    barWidth: 10,
+                    data: [20, 25, 18, 35, 25],
+                    itemStyle: { color: '#09C0D7', borderRadius: [5, 5, 0, 0] }
+                },
+                {
+                    name: '班级平均',
+                    type: 'bar',
+                    barWidth: 10,
+                    data: [22, 28, 20, 30, 30],
+                    itemStyle: { color: '#E5E7EB', borderRadius: [5, 5, 0, 0] }
+                }
+            ]
+        };
+        timeChart.setOption(timeOption);
+
+        // Chart 3: Question Type Analysis (Stacked Bar)
+        const typeChart = echarts.init(document.getElementById('typeAnalysisChart'));
+        const typeOption = {
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            legend: { data: ['填空题', '解答题', '计算题'], bottom: 0 },
+            grid: { top: '10%', left: '3%', right: '4%', bottom: '15%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                data: ['课时3', '课时2', '课时1', '课时3', '课时1'],
+                axisLine: { lineStyle: { color: '#ddd' } },
+                axisLabel: { color: '#666' }
+            },
+            yAxis: {
+                type: 'value',
+                name: '错题类型占比(%)',
+                splitLine: { lineStyle: { color: '#f0f0f0' } }
+            },
+            series: [
+                {
+                    name: '填空题',
+                    type: 'bar',
+                    stack: 'total',
+                    barWidth: 15,
+                    data: [20, 30, 10, 50, 25],
+                    itemStyle: { color: '#34D399' }
+                },
+                {
+                    name: '解答题',
+                    type: 'bar',
+                    stack: 'total',
+                    barWidth: 15,
+                    data: [30, 20, 40, 20, 50],
+                    itemStyle: { color: '#60A5FA' }
+                },
+                {
+                    name: '计算题',
+                    type: 'bar',
+                    stack: 'total',
+                    barWidth: 15,
+                    data: [50, 50, 50, 30, 25],
+                    itemStyle: { color: '#FBBF24' }
+                }
+            ]
+        };
+        typeChart.setOption(typeOption);
+
+        // Resize charts on window resize
+        window.addEventListener('resize', () => {
+            scoreChart.resize();
+            timeChart.resize();
+            typeChart.resize();
+        });
+    </script>
+</body>
+
+</html>
