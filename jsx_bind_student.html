@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绑定新学生 - 智慧学习导航仪</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <style>
+        :root {
+            --primary-cyan: #00bcd4;
+            --primary-cyan-dark: #00acc1;
+            --bg-gray: #f5f7fa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+        }
+
+        .header-bg {
+            background: linear-gradient(180deg, #26c6da 0%, #00bcd4 100%);
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+    </style>
+</head>
+
+<body class="pb-10">
+
+    <!-- Header -->
+    <header class="header-bg pt-6 px-6 relative z-10">
+        <div class="flex items-center mb-6">
+            <button onclick="history.back()" class="bg-white/20 p-2 rounded-full text-white backdrop-blur-sm">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-xl font-bold text-white ml-4">绑定新孩子</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-4 -mt-10 relative z-20">
+        <div class="bg-white rounded-3xl p-6 card-shadow mb-6">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-cyan-50 rounded-full mx-auto mb-4 flex items-center justify-center text-cyan-500">
+                    <i data-lucide="user-plus" class="w-10 h-10"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800">填写孩子信息</h2>
+                <p class="text-sm text-gray-500 mt-1">绑定后可查看专属学情报告</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); window.location.href='jsx_home.html';" class="space-y-5">
+                <!-- Name Input -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">孩子姓名</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-3 top-3.5 w-5 h-5 text-gray-400"></i>
+                        <input type="text" placeholder="请输入孩子姓名" required
+                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 outline-none transition">
+                    </div>
+                </div>
+
+                <!-- ID/Code Input -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">邀请码 / 学号</label>
+                    <div class="relative">
+                        <i data-lucide="qr-code" class="absolute left-3 top-3.5 w-5 h-5 text-gray-400"></i>
+                        <input type="text" placeholder="请输入学校或老师提供的邀请码"
+                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 outline-none transition">
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1 ml-1">如有学校邀请码请填写，可自动关联班级</p>
+                </div>
+
+                <!-- Relationship -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">您是孩子的</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="relation" class="peer sr-only" checked>
+                            <div class="text-center py-2 rounded-xl border border-gray-200 peer-checked:bg-cyan-50 peer-checked:border-cyan-500 peer-checked:text-cyan-600 transition">
+                                爸爸
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="relation" class="peer sr-only">
+                            <div class="text-center py-2 rounded-xl border border-gray-200 peer-checked:bg-cyan-50 peer-checked:border-cyan-500 peer-checked:text-cyan-600 transition">
+                                妈妈
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="relation" class="peer sr-only">
+                            <div class="text-center py-2 rounded-xl border border-gray-200 peer-checked:bg-cyan-50 peer-checked:border-cyan-500 peer-checked:text-cyan-600 transition">
+                                其他
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-200 active:scale-95 transition-transform">
+                        立即绑定
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

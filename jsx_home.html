@@ -308,16 +308,19 @@
             <h3 class="text-xl font-bold text-center text-gray-800 mb-6">切换当前学生</h3>
 
             <div class="space-y-3 mb-6">
-                <!-- Current Student -->
+                <!-- Case 1: School + Class (Current) -->
                 <div class="border-2 border-cyan-400 bg-cyan-50 rounded-2xl p-3 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                            class="w-12 h-12 rounded-full bg-white">
+                        <div class="relative">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+                                class="w-12 h-12 rounded-full bg-white">
+                            <div class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full border border-white">在读</div>
+                        </div>
                         <div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-cyan-600">张小明 (当前)</span>
                             </div>
-                            <p class="text-xs text-gray-500">六年级 · 演示学校</p>
+                            <p class="text-xs text-gray-500">演示学校 · 六年级2班</p>
                         </div>
                     </div>
                     <div class="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-white">
@@ -325,23 +328,44 @@
                     </div>
                 </div>
 
-                <!-- Other Student -->
+                <!-- Case 2: School Only (No Class) -->
                 <div onclick="switchStudent('张小红')"
                     class="border border-gray-100 rounded-2xl p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
                     <div class="flex items-center space-x-3">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Annie"
-                            class="w-12 h-12 rounded-full bg-gray-100">
+                        <div class="relative">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Annie"
+                                class="w-12 h-12 rounded-full bg-gray-100">
+                            <div class="absolute -bottom-1 -right-1 bg-blue-400 text-white text-[10px] px-1.5 py-0.5 rounded-full border border-white">未分班</div>
+                        </div>
                         <div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-gray-800">张小红</span>
                             </div>
-                            <p class="text-xs text-gray-500">三年级 · 演示学校</p>
+                            <p class="text-xs text-gray-500">演示学校 · 暂无班级信息</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case 3: No School -->
+                <div onclick="switchStudent('王小刚')"
+                    class="border border-gray-100 rounded-2xl p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bob"
+                                class="w-12 h-12 rounded-full bg-gray-100">
+                            <div class="absolute -bottom-1 -right-1 bg-gray-400 text-white text-[10px] px-1.5 py-0.5 rounded-full border border-white">未加入</div>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-gray-800">王小刚</span>
+                            </div>
+                            <p class="text-xs text-gray-500">暂无学校信息</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button
+            <button onclick="window.location.href='jsx_bind_student.html'"
                 class="w-full py-3 border border-dashed border-gray-300 rounded-xl text-gray-400 font-bold flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition">
                 <i data-lucide="plus" class="w-5 h-5 mr-1"></i> 绑定新孩子
             </button>
