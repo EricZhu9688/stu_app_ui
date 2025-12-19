@@ -598,6 +598,26 @@
             </div>
 
             <div class="space-y-6 pb-4">
+                <!-- 年级 (New) -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">年级</label>
+                    <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto scrollbar-hide">
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">全部</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">一年级</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">二年级</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-cyan-50 text-[#09C0D7] border-[#09C0D7]">三年级</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">四年级</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">五年级</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">六年级</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">初一</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">初二</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">初三</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">高一</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">高二</button>
+                         <button class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">高三</button>
+                    </div>
+                </div>
+
                 <!-- 类型 -->
                 <div class="space-y-2">
                     <label class="text-sm font-bold text-gray-700">内容类型</label>
@@ -615,7 +635,7 @@
                         <button
                             class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">进阶练习</button>
                         <button
-                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-pink-50 text-pink-600 border-pink-200">习作练习</button>
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">习作练习</button>
                     </div>
                 </div>
 
@@ -624,24 +644,34 @@
                     <label class="text-sm font-bold text-gray-700">完成状态</label>
                     <div class="flex flex-wrap gap-2">
                         <button
-                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">未开始</button>
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">未开始/未采集</button>
                         <button
-                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">进行中</button>
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">进行中/批阅中</button>
                         <button
-                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">已完成</button>
+                            class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">已完成/已批阅</button>
                     </div>
                 </div>
 
                 <!-- 时间 -->
                 <div class="space-y-2">
                     <label class="text-sm font-bold text-gray-700">时间范围</label>
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-2 mb-2">
                         <button
                             class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">本周</button>
                         <button
                             class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">本月</button>
                         <button
                             class="px-3 py-1.5 rounded-full text-xs font-bold border bg-white text-gray-500 border-gray-200">本学期</button>
+                    </div>
+                    <!-- Custom Date Range -->
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input type="date" class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 bg-gray-50 focus:outline-none focus:border-[#09C0D7]">
+                        </div>
+                        <span class="text-gray-400">-</span>
+                        <div class="relative flex-1">
+                            <input type="date" class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 bg-gray-50 focus:outline-none focus:border-[#09C0D7]">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -650,7 +680,7 @@
                 <button
                     class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-colors">重置</button>
                 <button onclick="toggleFilterModal()"
-                    class="flex-[2] py-3 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 hover:bg-[#08acc0] transition-colors">确认筛选</button>
+                    class="flex-[2] py-3 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 hover:bg-[#08acc0] transition-colors">确认筛选 (5)</button>
             </div>
         </div>
     </div>
