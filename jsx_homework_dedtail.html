@@ -4,15 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提交作业详情</title>
+    <title>王婉丽的作业详情</title>
     <script src="js/tailwind.min.js"></script>
     <script src="js/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
+            padding-bottom: 100px; /* Space for footer */
         }
 
         .fade-in {
@@ -29,372 +31,830 @@
                 transform: translateY(0);
             }
         }
+
+        /* Custom Scrollbar for horizontal scrolling */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
-<body class="pb-24">
+<body>
 
     <!-- Header -->
-    <div class="bg-gradient-to-br from-[#09C0D7] to-[#06A2B5] text-white pt-6 pb-6 px-4 shadow-md sticky top-0 z-50">
-        <div class="flex items-center justify-between">
+    <div class="bg-gradient-to-br from-[#09C0D7] to-[#06A2B5] text-white pt-4 pb-20 px-4 shadow-md sticky top-0 z-40 rounded-b-[2rem]">
+        <div class="flex items-center justify-between mb-4">
             <button onclick="history.back()" class="p-1 rounded-full hover:bg-white/10 transition-colors">
-            <i data-lucide="chevron-left" class="w-6 h-6"></i>
-        </button>
-            <h1 class="text-lg font-bold">提交作业</h1>
-            <div class="flex items-center gap-2 bg-black/10 rounded-full px-2 py-1">
-                <i data-lucide="more-horizontal" class="w-5 h-5"></i>
-                <div class="w-px h-4 bg-white/20"></div>
-                <i data-lucide="minus" class="w-5 h-5"></i>
-                <div class="w-px h-4 bg-white/20"></div>
-                <i data-lucide="disc" class="w-5 h-5"></i>
-            </div>
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-lg font-bold">王婉丽的作业详情</h1>
+            <div class="w-6"></div> <!-- Spacer -->
         </div>
-    </div>
 
-    <!-- State Switcher (For Demo Purpose) -->
-    <div class="fixed top-20 right-4 z-40 bg-white/90 backdrop-blur shadow-lg rounded-lg p-2 text-xs border border-gray-200 flex flex-col gap-2">
-        <div class="font-bold text-gray-500 mb-1 px-1">状态切换 (演示)</div>
-        <button onclick="setPageState('uncollected')" class="px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200 text-left">1. 未采集</button>
-        <button onclick="setPageState('grading')" class="px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200 text-left">2. 批阅中</button>
-        <button onclick="setPageState('graded')" class="px-3 py-1.5 rounded bg-[#09C0D7]/10 text-[#09C0D7] hover:bg-[#09C0D7]/20 text-left font-bold">3. 已批阅</button>
-    </div>
+        <!-- Top Status Tabs (Demo Switcher disguised as UI) -->
+        <div class="flex justify-start gap-6 text-sm font-medium text-white/80 mb-6 px-2">
+            <button onclick="setPageState('uncollected')" id="tab-state-uncollected" class="pb-1 border-b-2 border-transparent hover:text-white transition-colors">未提交</button>
+            <button onclick="setPageState('grading')" id="tab-state-grading" class="pb-1 border-b-2 border-transparent hover:text-white transition-colors">批阅中</button>
+            <button onclick="setPageState('graded')" id="tab-state-graded" class="pb-1 border-b-2 border-transparent hover:text-white transition-colors">已批阅</button>
+        </div>
 
-    <div class="px-4 mt-4 space-y-4">
-
-        <!-- 1. 作业信息 (Homework Info) - Always Visible -->
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div class="flex justify-between items-start mb-3">
-                <div class="flex gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#3B82F6] text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
-                        数学
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-gray-800 text-lg leading-tight mb-1">课时 2 分数乘分数</h2>
-                        <div class="text-xs text-gray-400">
-                            更新时间：2025-12-17 19:16
-                        </div>
-                    </div>
+        <!-- Student & Homework Info Card -->
+        <div class="flex items-start gap-4">
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full border-2 border-white/30 bg-white/20 overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="w-full h-full object-cover">
                 </div>
-                <span class="text-[10px] text-[#3B82F6] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded font-medium">
-                    待生成精准练习
-                </span>
+                <div class="absolute -bottom-1 -right-1 bg-white text-[#09C0D7] rounded-full p-1 shadow-sm">
+                    <i data-lucide="image" class="w-3 h-3"></i>
+                </div>
             </div>
-
-            <!-- Metadata Grid -->
-            <div class="grid grid-cols-3 gap-y-2 text-xs text-gray-500 mt-4 px-1">
-                <div>题数：<span class="text-gray-800 font-medium">9</span></div>
-                <div>满分：<span class="text-gray-800 font-medium">29分</span></div>
-                <div>测评时间：<span class="text-gray-800 font-medium">20分钟</span></div>
+            <div class="flex-1">
+                <h2 class="text-xl font-bold leading-tight mb-2">分数混合运算及简便计...</h2>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-white/20 rounded text-xs backdrop-blur-sm">数学</span>
+                    <span class="px-2 py-0.5 bg-white/20 rounded text-xs backdrop-blur-sm">页码: P45-46</span>
+                </div>
+                <div class="text-xs text-white/70 flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3 h-3"></i> 更新于 2025-09-15
+                </div>
             </div>
-
-            <!-- Page Number -->
-            <div class="mt-4 flex items-center gap-2">
-                <span class="text-xs text-gray-400">页码：</span>
-                <span class="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-700 bg-gray-50">3</span>
-            </div>
-        </div>
-
-        <!-- 2. 作答情况 (Performance) -->
-        <div class="space-y-2">
-            <div class="flex items-center gap-2 px-1">
-                <div class="w-1 h-4 bg-[#6366f1] rounded-full"></div>
-                <h3 class="font-bold text-gray-700">作答情况</h3>
-            </div>
-            
-            <div id="performance-section" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex justify-around items-center text-center min-h-[140px]">
-                <!-- Dynamic Content injected by JS -->
+            <!-- Status Badge -->
+            <div id="header-status-badge">
+                <!-- Injected by JS -->
             </div>
         </div>
+        
+        <!-- View Original Image Link -->
+        <div class="mt-4 bg-white/10 rounded-lg py-2 px-4 flex items-center justify-center gap-2 text-sm font-medium backdrop-blur-sm cursor-pointer hover:bg-white/20 transition-colors">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+            查看孩子作答原图
+            <i data-lucide="chevron-right" class="w-4 h-4 ml-auto opacity-50"></i>
+        </div>
+    </div>
 
-        <!-- 3. 题目 (Questions) -->
-        <div class="space-y-2">
-            <div class="flex items-center gap-2 px-1">
-                <div class="w-1 h-4 bg-[#6366f1] rounded-full"></div>
-                <h3 class="font-bold text-gray-700">题目</h3>
-            </div>
-
-            <div id="questions-section" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-h-[100px]">
-                 <!-- Dynamic Content injected by JS -->
-            </div>
+    <!-- Main Content Container (Overlaps Header) -->
+    <div class="px-4 -mt-14 relative z-50">
+        
+        <!-- Navigation Tabs -->
+        <div class="bg-white rounded-2xl p-1 shadow-lg shadow-gray-100 flex mb-4">
+            <button onclick="switchTab('questions')" id="nav-questions" class="flex-1 py-3 rounded-xl text-sm font-bold text-[#09C0D7] bg-[#E0F7FA] transition-all flex items-center justify-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4"></i> 作答情况
+            </button>
+            <button onclick="switchTab('analysis')" id="nav-analysis" class="flex-1 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i> 学情分析
+            </button>
         </div>
 
-        <!-- 4. 作答原图 (Original Image) -->
-        <div class="space-y-2">
-            <div class="flex items-center gap-2 px-1">
-                <div class="w-1 h-4 bg-[#6366f1] rounded-full"></div>
-                <h3 class="font-bold text-gray-700">作答原图</h3>
-            </div>
-
-            <div id="image-section" class="bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
-                 <!-- Dynamic Content injected by JS -->
-            </div>
-        </div>
-
-        <!-- 5. 评语 (Comments) - Only visible in Graded? Assuming always visible but empty if not graded -->
-        <div class="space-y-2">
-            <div class="flex items-center gap-2 px-1">
-                <div class="w-1 h-4 bg-[#6366f1] rounded-full"></div>
-                <h3 class="font-bold text-gray-700">评语</h3>
-            </div>
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-h-[80px] flex items-center">
-                <p class="text-sm text-gray-400">暂无评语...</p>
-            </div>
+        <!-- Content Area -->
+        <div id="content-area">
+            <!-- Injected by JS -->
         </div>
 
     </div>
 
     <!-- Footer -->
-    <div id="action-footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-6 flex gap-3 z-50">
-        <!-- Content will be injected by JS -->
+    <div id="action-footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-8 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex items-center gap-3">
+        <!-- Injected by JS -->
+    </div>
+
+    <!-- Modal for Question Details -->
+    <div id="question-modal" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300" aria-hidden="true">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2rem] h-[85vh] flex flex-col shadow-2xl transform translate-y-full transition-transform duration-300" id="modal-panel">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <span class="w-1 h-4 bg-[#09C0D7] rounded-full"></span>
+                    <h3 class="text-lg font-bold text-gray-800">题目详情</h3>
+                </div>
+                <button onclick="closeModal()" class="p-2 bg-gray-50 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-5 pb-20">
+                
+                <!-- Original Question -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-bold text-gray-400 flex items-center gap-2">
+                            <i data-lucide="file-question" class="w-4 h-4"></i> 原题
+                        </h4>
+                        <span id="modal-difficulty" class="text-xs text-orange-400 font-bold bg-orange-50 px-2 py-1 rounded">难度 3</span>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                        <p id="modal-question-content" class="text-gray-800 font-bold text-base leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Student Answer Area -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
+                        <i data-lucide="pen-tool" class="w-4 h-4"></i> 我的作答
+                    </h4>
+                    
+                    <div class="relative rounded-2xl overflow-hidden border border-gray-200 bg-white min-h-[240px] shadow-sm">
+                        <!-- Simulated Answer Image -->
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] opacity-10"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <p class="text-gray-400 text-sm font-medium">此处显示学生作答手写图片</p>
+                            <!-- Simulated Handwritten Text -->
+                            <p id="modal-student-answer-text" class="absolute font-handwriting text-2xl text-blue-600 transform -rotate-2" style="font-family: 'Comic Sans MS', cursive;">
+                                <!-- Injected JS -->
+                            </p>
+                        </div>
+
+                        <!-- Correction Overlay (Teacher's Marking) -->
+                        <div id="modal-correction-layer" class="absolute inset-0 pointer-events-none">
+                            <!-- Injected by JS: Ticks, Crosses, Circles -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Comment -->
+                <div id="modal-teacher-comment" class="bg-purple-50 rounded-2xl p-4 flex gap-3 border border-purple-100 hidden">
+                    <div class="w-10 h-10 rounded-full bg-white border-2 border-purple-100 flex items-center justify-center text-purple-500 shadow-sm flex-shrink-0">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher" alt="Teacher" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h5 class="text-xs font-bold text-purple-800">数学老师</h5>
+                            <span class="text-[10px] text-purple-400 bg-purple-100 px-1.5 py-0.5 rounded">刚刚</span>
+                        </div>
+                        <p class="text-sm text-purple-700 leading-relaxed font-medium">
+                            解题思路很清晰，但是要注意最后一步的计算，建议多检查一遍乘法口诀。
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="p-4 border-t border-gray-100 bg-white flex items-center gap-3">
+                <button onclick="prevQuestion()" id="modal-btn-prev" class="flex-1 py-3 bg-gray-50 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-4 h-4 inline mr-1"></i> 上一题
+                </button>
+                <button onclick="nextQuestion()" id="modal-btn-next" class="flex-1 py-3 bg-[#09C0D7] text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-200 hover:bg-[#08aebd] transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:bg-gray-300">
+                    下一题 <i data-lucide="chevron-right" class="w-4 h-4 inline ml-1"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        lucide.createIcons();
+        // Global State
+        let currentState = 'uncollected'; // uncollected, grading, graded
+        let currentTab = 'questions'; // questions, analysis
+        let showWrongOnly = false; // Filter state for questions
+        let currentDisplayData = []; // Currently displayed questions
+        let currentModalIndex = 0; // Index of question in modal
 
-        // State Renderers
-        const sections = {
-            performance: document.getElementById('performance-section'),
-            questions: document.getElementById('questions-section'),
-            image: document.getElementById('image-section'),
-            footer: document.getElementById('action-footer')
-        };
+        // Mock Data
+        const questionsData = [
+            { 
+                id: 1, 
+                type: '数学 · 计算题', 
+                content: '3/4 × 8/9 + 1/3 = ?', 
+                difficulty: 3,
+                isCorrect: true,
+                wrongRate: '15%',
+                tags: ['已掌握']
+            },
+            { 
+                id: 2, 
+                type: '数学 · 计算题', 
+                content: '(1/2 + 1/3) × 6 = ?', 
+                difficulty: 3,
+                isCorrect: true,
+                wrongRate: '12%',
+                tags: ['已掌握']
+            },
+            { 
+                id: 3, 
+                type: '数学 · 计算题', 
+                content: '我知道本文《大青树下的小学》第3自然段写的是同学们课上认真读书和课下尽情玩耍的场景。', 
+                difficulty: 4,
+                isCorrect: false,
+                wrongRate: '85%',
+                tags: ['待改进', '概念未掌握']
+            },
+            { 
+                id: 4, 
+                type: '数学 · 应用题', 
+                content: '一个长方形的长是8厘米，宽是5厘米，它的周长是多少厘米？', 
+                difficulty: 2,
+                isCorrect: true,
+                wrongRate: '5%',
+                tags: ['已掌握']
+            },
+            { 
+                id: 5, 
+                type: '数学 · 几何题', 
+                content: '图中阴影部分的面积是多少平方厘米？', 
+                difficulty: 5,
+                isCorrect: false,
+                wrongRate: '60%',
+                tags: ['待改进']
+            },
+            { 
+                id: 6, 
+                type: '数学 · 逻辑题', 
+                content: '找规律填数：1, 4, 9, 16, ( )', 
+                difficulty: 4,
+                isCorrect: false,
+                wrongRate: '45%',
+                tags: ['待改进']
+            },
+            { 
+                id: 7, 
+                type: '数学 · 计算题', 
+                content: '125 × 8 = ?', 
+                difficulty: 1,
+                isCorrect: true,
+                wrongRate: '2%',
+                tags: ['已掌握']
+            }
+        ];
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            const urlParams = new URLSearchParams(window.location.search);
+            const stateParam = urlParams.get('state');
+            if(stateParam) currentState = stateParam;
+            
+            renderPage();
+        });
 
         function setPageState(state) {
-            console.log('Switching state to:', state);
-            
-            // Render Performance
-            renderPerformance(state);
-            
-            // Render Questions
-            renderQuestions(state);
-            
-            // Render Image
-            renderImage(state);
-
-            // Render Footer
-            renderFooter(state);
-
-            // Trigger Animation
-            document.querySelectorAll('.animate-on-change').forEach(el => {
-                el.classList.remove('fade-in');
-                void el.offsetWidth; // trigger reflow
-                el.classList.add('fade-in');
-            });
+            currentState = state;
+            renderPage();
         }
 
-        function renderFooter(state) {
-            const footer = sections.footer;
-            if (!footer) return;
+        function switchTab(tab) {
+            currentTab = tab;
+            renderPage();
+        }
 
-            if (state === 'uncollected') {
-                // Hide footer for uncollected state (User uses the main "Collect" button)
-                footer.style.display = 'none';
-                document.body.classList.remove('pb-24');
-                document.body.classList.add('pb-6');
-            } else if (state === 'grading') {
-                // Show grading status
-                footer.style.display = 'flex';
-                footer.innerHTML = `
-                    <div class="w-full py-3 bg-gray-50 text-gray-400 rounded-xl font-bold text-sm text-center border border-gray-100 flex items-center justify-center gap-2">
-                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 正在智能批改中...
+        function toggleWrongOnly() {
+            showWrongOnly = !showWrongOnly;
+            const contentArea = document.getElementById('content-area');
+            if (currentTab === 'questions') {
+                renderQuestionsTab(contentArea);
+                lucide.createIcons();
+            }
+        }
+
+        function openQuestionModal(index) {
+            currentModalIndex = index;
+            const q = currentDisplayData[index];
+            if (!q) return;
+
+            // Populate Data
+            document.getElementById('modal-difficulty').innerHTML = `难度 ${q.difficulty}`;
+            document.getElementById('modal-question-content').innerText = q.content;
+            
+            // Student Answer (Mock Simulation)
+            // In a real app, this would come from q.studentAnswerUrl
+            let answerText = '学生未作答';
+            if (q.content.includes('3/4')) answerText = '3/4 × 8/9 + 1/3 = 1';
+            else if (q.content.includes('1/2')) answerText = '(1/2 + 1/3) × 6 = 5';
+            else if (q.content.includes('大青树')) answerText = '写的是同学们课上认真读书和课下尽情玩耍的场景。';
+            else if (q.content.includes('长方形')) answerText = '(8 + 5) × 2 = 26厘米';
+            else if (q.content.includes('阴影部分')) answerText = '3.14 × 4 = 12.56';
+            else if (q.content.includes('找规律')) answerText = '25';
+            else if (q.content.includes('125')) answerText = '1000';
+            
+            document.getElementById('modal-student-answer-text').innerText = answerText;
+
+            // Correction Overlay
+            const layer = document.getElementById('modal-correction-layer');
+            layer.innerHTML = '';
+            
+            const teacherCommentSection = document.getElementById('modal-teacher-comment');
+
+            if (currentState === 'graded') {
+                if (q.isCorrect) {
+                     layer.innerHTML = `<div class="absolute right-4 top-4 text-[#34D399] drop-shadow-md animate-bounce"><i data-lucide="check-circle-2" class="w-16 h-16"></i></div>`;
+                     teacherCommentSection.classList.add('hidden');
+                } else {
+                     layer.innerHTML = `<div class="absolute right-4 top-4 text-[#F87171] drop-shadow-md animate-pulse"><i data-lucide="x-circle" class="w-16 h-16"></i></div>`;
+                     teacherCommentSection.classList.remove('hidden');
+                }
+            } else {
+                 teacherCommentSection.classList.add('hidden');
+            }
+
+            // Show Modal
+            const modal = document.getElementById('question-modal');
+            const panel = document.getElementById('modal-panel');
+            
+            modal.classList.remove('hidden');
+            // Force reflow
+            void modal.offsetWidth;
+            
+            modal.classList.remove('opacity-0');
+            panel.classList.remove('translate-y-full');
+            
+            updateModalButtons();
+            
+            setTimeout(() => {
+                lucide.createIcons();
+            }, 50);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('question-modal');
+            const panel = document.getElementById('modal-panel');
+            
+            modal.classList.add('opacity-0');
+            panel.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function updateModalButtons() {
+            const btnPrev = document.getElementById('modal-btn-prev');
+            const btnNext = document.getElementById('modal-btn-next');
+            
+            btnPrev.disabled = currentModalIndex <= 0;
+            btnNext.disabled = currentModalIndex >= currentDisplayData.length - 1;
+        }
+
+        function nextQuestion() {
+            if (currentModalIndex < currentDisplayData.length - 1) {
+                openQuestionModal(currentModalIndex + 1);
+            }
+        }
+
+        function prevQuestion() {
+            if (currentModalIndex > 0) {
+                openQuestionModal(currentModalIndex - 1);
+            }
+        }
+
+        function renderPage() {
+            // Update Header Status Tabs Visuals
+            ['uncollected', 'grading', 'graded'].forEach(s => {
+                const btn = document.getElementById(`tab-state-${s}`);
+                if (currentState === s) {
+                    btn.classList.add('border-white', 'text-white');
+                    btn.classList.remove('border-transparent');
+                } else {
+                    btn.classList.remove('border-white', 'text-white');
+                    btn.classList.add('border-transparent');
+                }
+            });
+
+            // Update Nav Tabs Visuals
+            const navQuestions = document.getElementById('nav-questions');
+            const navAnalysis = document.getElementById('nav-analysis');
+
+            if (currentTab === 'questions') {
+                navQuestions.className = 'flex-1 py-3 rounded-xl text-sm font-bold text-[#09C0D7] bg-[#E0F7FA] transition-all flex items-center justify-center gap-2 shadow-sm';
+                navAnalysis.className = 'flex-1 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-all flex items-center justify-center gap-2';
+            } else {
+                navAnalysis.className = 'flex-1 py-3 rounded-xl text-sm font-bold text-[#09C0D7] bg-[#E0F7FA] transition-all flex items-center justify-center gap-2 shadow-sm';
+                navQuestions.className = 'flex-1 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-all flex items-center justify-center gap-2';
+            }
+
+            // Render Header Badge
+            const badgeContainer = document.getElementById('header-status-badge');
+            if (currentState === 'uncollected') {
+                badgeContainer.innerHTML = `<span class="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full backdrop-blur-sm">未提交</span>`;
+            } else if (currentState === 'grading') {
+                badgeContainer.innerHTML = `<span class="px-3 py-1 bg-[#FBBF24] text-white text-xs font-bold rounded-full shadow-lg shadow-yellow-500/20">批阅中</span>`;
+            } else {
+                badgeContainer.innerHTML = `<span class="px-3 py-1 bg-[#34D399] text-white text-xs font-bold rounded-full shadow-lg shadow-green-500/20">批阅结束</span>`;
+            }
+
+            // Render Main Content
+            const contentArea = document.getElementById('content-area');
+            if (currentTab === 'questions') {
+                renderQuestionsTab(contentArea);
+            } else {
+                renderAnalysisTab(contentArea);
+            }
+
+            // Render Footer
+            renderFooter();
+
+            // Re-init icons
+            lucide.createIcons();
+        }
+
+        function renderQuestionsTab(container) {
+            // Filter Data
+            currentDisplayData = showWrongOnly 
+                ? questionsData.filter(q => !q.isCorrect) 
+                : questionsData;
+
+            const displayData = currentDisplayData;
+
+            // Toggle Visuals
+            const toggleColor = showWrongOnly ? 'bg-[#09C0D7]' : 'bg-gray-200';
+            const knobPosition = showWrongOnly ? 'translate-x-4' : 'translate-x-0';
+
+            // Quick Jump Section
+            let quickJumpHTML = `
+                <div class="bg-white rounded-2xl p-5 shadow-sm mb-4 animate-on-change">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-bold text-gray-400">答题卡快速跳转</h3>
+                        ${currentState === 'graded' ? `
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-[#34D399]"></div><span class="text-[10px] text-gray-400">正确</span></div>
+                                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-[#F87171]"></div><span class="text-[10px] text-gray-400">错误</span></div>
+                                <div class="w-px h-3 bg-gray-200 mx-1"></div>
+                                <span class="text-[10px] text-gray-400">只看错题</span>
+                                <div onclick="toggleWrongOnly()" class="w-8 h-4 ${toggleColor} rounded-full relative cursor-pointer transition-colors">
+                                    <div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full shadow-sm transition-transform duration-200 ${knobPosition}"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+                        ${questionsData.map(q => {
+                            let statusClass = 'bg-gray-50 text-gray-500';
+                            if (currentState === 'graded') {
+                                if (!q.isCorrect) statusClass = 'bg-[#FEF2F2] text-[#DC2626] font-bold border border-[#DC2626]/10';
+                                else statusClass = 'bg-[#ECFDF5] text-[#059669] font-bold border border-[#059669]/10';
+                            }
+                            
+                            // If filtered, maybe dim the ones not shown? 
+                            // Or just keep them all clickable to jump (functionality to be added later)
+                            // For now, let's just show them all as the map is based on full questionsData
+                            return `<div class="w-9 h-9 rounded-lg flex items-center justify-center text-sm ${statusClass} flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity">${q.id}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Questions List
+            let questionsHTML = '';
+            
+            if (displayData.length === 0) {
+                 questionsHTML = `
+                    <div class="bg-white rounded-2xl p-10 shadow-sm mb-3 flex flex-col items-center justify-center text-center animate-on-change">
+                        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-3 text-green-500">
+                            <i data-lucide="smile" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800">太棒了！</h3>
+                        <p class="text-xs text-gray-400 mt-1">没有错题，继续保持哦</p>
                     </div>
                 `;
-                document.body.classList.add('pb-24');
-                document.body.classList.remove('pb-6');
-            } else { 
-                // Graded: Show Actions
-                footer.style.display = 'flex';
-                footer.innerHTML = `
-                    <button class="flex-1 py-3 bg-[#09C0D7]/10 text-[#09C0D7] rounded-xl font-bold text-sm border border-[#09C0D7]/20 active:scale-95 transition-transform">
-                        重新提交
-                    </button>
-                    <button class="flex-[2] py-3 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-100 active:scale-95 transition-transform">
-                        查看报告
-                    </button>
+            } else {
+                questionsHTML = displayData.map((q, index) => {
+                    let statusBadge = '';
+                    let resultIcon = '';
+                    let footerActions = '';
+
+                    if (currentState === 'graded') {
+                        let dynamicButton = '';
+                        if (q.isCorrect) {
+                            statusBadge = `<span class="px-2 py-0.5 bg-[#ECFDF5] text-[#059669] text-[10px] font-bold rounded">已掌握</span>`;
+                            resultIcon = `<div class="absolute right-4 top-4 text-[#34D399]"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>`; 
+                            dynamicButton = `<button class="flex items-center justify-center gap-1 text-xs text-[#09C0D7] font-bold py-2"><i data-lucide="bookmark" class="w-4 h-4"></i> 加入错题本</button>`;
+                        } else {
+                            statusBadge = `<span class="px-2 py-0.5 bg-[#FEF2F2] text-[#DC2626] text-[10px] font-bold rounded">待攻克</span>`;
+                            if (q.tags.includes('概念未掌握')) statusBadge += `<span class="ml-2 px-2 py-0.5 bg-purple-50 text-purple-600 text-[10px] font-bold rounded">#概念未掌握</span>`;
+                            dynamicButton = `<button class="flex items-center justify-center gap-1 text-xs text-[#09C0D7] font-bold py-2"><i data-lucide="check-circle" class="w-4 h-4"></i> 标记已掌握</button>`;
+                        }
+                        
+                        footerActions = `
+                            <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-50 mt-4 pt-2">
+                                <button class="flex items-center justify-center gap-1 text-xs text-purple-500 font-bold py-2"><i data-lucide="message-circle" class="w-4 h-4"></i> AI 答疑</button>
+                                <button class="flex items-center justify-center gap-1 text-xs text-orange-500 font-bold py-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i> 举一反三</button>
+                                ${dynamicButton}
+                            </div>
+                        `;
+                    } else {
+                        // Uncollected or Grading
+                        footerActions = `
+                            <div class="grid grid-cols-2 divide-x divide-gray-100 border-t border-gray-50 mt-4 pt-2">
+                                <button class="flex items-center justify-center gap-1 text-xs text-purple-500 font-bold py-2"><i data-lucide="message-circle" class="w-4 h-4"></i> AI 答疑</button>
+                                <button class="flex items-center justify-center gap-1 text-xs text-orange-500 font-bold py-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i> 举一反三</button>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="bg-white rounded-2xl p-5 shadow-sm mb-3 relative animate-on-change cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]" onclick="openQuestionModal(${index})">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-2">
+                                    ${statusBadge}
+                                    <span class="text-xs text-gray-400">${q.type}</span>
+                                </div>
+                                <div class="flex gap-0.5">
+                                    ${Array(5).fill(0).map((_, i) => `<div class="w-1.5 h-1.5 rounded-full ${i < q.difficulty ? 'bg-yellow-400' : 'bg-gray-200'}"></div>`).join('')}
+                                </div>
+                                ${currentState === 'graded' && !q.isCorrect ? `<div class="absolute right-4 top-4 text-xs text-gray-400">${q.wrongRate}学生做错</div>` : ''}
+                            </div>
+                            
+                            <div class="mb-2">
+                                <span class="text-[#09C0D7] font-bold mr-1">${q.id}.</span>
+                                <span class="text-gray-800 font-bold text-sm leading-relaxed">${q.content}</span>
+                            </div>
+
+                            <!-- Placeholder for content/image -->
+                            <div class="w-full h-24 bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 mt-3 mb-2">
+                                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-purple-900">
+                                    <i data-lucide="cat" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs text-gray-400 font-medium">思考一下</span>
+                                <span class="text-[10px] text-gray-300">点击查看解析与答案</span>
+                            </div>
+
+                            ${footerActions}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            container.innerHTML = quickJumpHTML + questionsHTML;
+        }
+
+        function renderAnalysisTab(container) {
+            if (currentState === 'graded') {
+                container.innerHTML = `
+                <!-- 1. Score Overview -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm mb-3 flex items-center justify-between animate-on-change">
+                    <div>
+                        <div class="text-xs text-gray-400 mb-1">本次作业得分率</div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-4xl font-black text-gray-800">85</span>
+                            <span class="text-sm font-bold text-gray-800">%</span>
+                        </div>
+                        <div class="text-[10px] text-[#059669] font-medium mt-1">超越了班级 82% 的同学</div>
+                    </div>
+                    <div class="relative w-20 h-20 flex items-center justify-center">
+                         <div id="score-circle-chart" class="w-full h-full"></div>
+                         <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-[#09C0D7]">优秀</div>
+                    </div>
+                </div>
+
+                <!-- 2. Time Stats -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm mb-3 flex items-center justify-between animate-on-change">
+                    <div>
+                        <div class="text-xs text-gray-400 mb-1">作业用时情况</div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-black text-gray-800">28</span>
+                            <span class="text-xs font-medium text-gray-500">分钟</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400 mb-1">全班平均时长</div>
+                        <div class="flex items-baseline gap-1 justify-end">
+                            <span class="text-xl font-bold text-gray-600">30</span>
+                            <span class="text-xs font-medium text-gray-400">min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Knowledge Points -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm mb-3 animate-on-change">
+                    <div class="flex items-center gap-2 mb-4 border-l-4 border-[#09C0D7] pl-2">
+                        <h3 class="font-bold text-gray-800 text-sm">知识点掌握度</h3>
+                        <span class="text-[10px] text-gray-400 ml-auto">对应题号</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Item -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700">分数乘法</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">1 &nbsp; 2</div>
+                                </div>
+                                <span class="text-xs font-bold text-[#09C0D7]">95%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#09C0D7] rounded-full" style="width: 95%"></div>
+                            </div>
+                        </div>
+                         <!-- Item -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700">简便计算</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">3</div>
+                                </div>
+                                <span class="text-xs font-bold text-[#09C0D7]">70%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#09C0D7] rounded-full" style="width: 70%"></div>
+                            </div>
+                        </div>
+                         <!-- Item -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700">应用题理解</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">5 &nbsp; 6</div>
+                                </div>
+                                <span class="text-xs font-bold text-[#F87171]">60%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#F87171] rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                         <!-- Item -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700">运算律应用</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">4 &nbsp; 7</div>
+                                </div>
+                                <span class="text-xs font-bold text-[#09C0D7]">85%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#09C0D7] rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Trend Chart -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm mb-3 animate-on-change">
+                    <div class="flex items-center gap-2 mb-2 border-l-4 border-[#09C0D7] pl-2">
+                        <h3 class="font-bold text-gray-800 text-sm">表现波动 vs 班级平均</h3>
+                    </div>
+                    <div id="trend-chart" class="w-full h-40"></div>
+                </div>
+
+                <!-- 5. Teacher Comment -->
+                <div class="bg-blue-50/50 rounded-2xl p-5 shadow-sm mb-3 border border-blue-100 animate-on-change">
+                    <div class="flex items-center gap-2 mb-2">
+                         <i data-lucide="message-square-quote" class="w-4 h-4 text-[#09C0D7]"></i>
+                        <h3 class="font-bold text-gray-800 text-sm">老师点评</h3>
+                    </div>
+                    <p class="text-xs text-gray-600 leading-relaxed italic">
+                        "婉丽这次作业在基础运算上很扎实，但在处理复杂应用题时对数量关系的理解还略欠火候。建议针对性加强应用题的逻辑拆解训练。"
+                    </p>
+                </div>
+                
+                <div class="h-8"></div>
+            `;
+            
+            initCharts();
+            } else {
+                // Render Empty State for Uncollected and Grading
+                let icon = '';
+                let title = '';
+                let desc = '';
+                let iconBg = '';
+                let iconColor = '';
+
+                if (currentState === 'uncollected') {
+                    icon = 'file-signature'; 
+                    title = '待解锁分析报告';
+                    desc = '提交作业并经老师批阅后，系统将为您生成多维度的学情分析报告。';
+                    iconBg = 'bg-red-50';
+                    iconColor = 'text-red-400';
+                } else { // grading
+                    icon = 'zap';
+                    title = '学情报告生成中';
+                    desc = '老师正在批改作业，完成后将第一时间为您汇总知识点掌握情况。';
+                    iconBg = 'bg-orange-50';
+                    iconColor = 'text-orange-400';
+                }
+
+                container.innerHTML = `
+                    <div class="bg-white rounded-[2rem] p-8 shadow-sm min-h-[60vh] flex flex-col items-center justify-center text-center animate-on-change relative overflow-hidden">
+                        
+                        <!-- Icon -->
+                        <div class="w-24 h-24 rounded-full ${iconBg} flex items-center justify-center mb-6">
+                            <i data-lucide="${icon}" class="w-10 h-10 ${iconColor}"></i>
+                        </div>
+
+                        <!-- Text -->
+                        <h3 class="text-xl font-black text-gray-800 mb-3">${title}</h3>
+                        <p class="text-sm text-gray-400 max-w-[260px] leading-relaxed mb-12">
+                            ${desc}
+                        </p>
+
+                        <!-- Skeleton Placeholders -->
+                        <div class="w-full flex gap-4 opacity-30">
+                             <div class="flex-1 h-24 bg-gray-100 rounded-2xl animate-pulse"></div>
+                             <div class="flex-1 h-24 bg-gray-100 rounded-2xl animate-pulse"></div>
+                        </div>
+                    </div>
                 `;
-                document.body.classList.add('pb-24');
-                document.body.classList.remove('pb-6');
+            }
+        }
+
+        function initCharts() {
+            setTimeout(() => {
+                // Score Circle
+                const scoreChartDom = document.getElementById('score-circle-chart');
+                if (scoreChartDom) {
+                    const myChart = echarts.init(scoreChartDom);
+                    const option = {
+                        series: [
+                            {
+                                type: 'pie',
+                                radius: ['85%', '100%'],
+                                avoidLabelOverlap: false,
+                                label: { show: false },
+                                data: [
+                                    { value: 85, itemStyle: { color: '#09C0D7' } },
+                                    { value: 15, itemStyle: { color: '#f3f4f6' } }
+                                ]
+                            }
+                        ]
+                    };
+                    myChart.setOption(option);
+                }
+
+                // Trend Chart
+                const trendChartDom = document.getElementById('trend-chart');
+                if (trendChartDom) {
+                    const myChart = echarts.init(trendChartDom);
+                    const option = {
+                        grid: { top: 10, right: 10, bottom: 20, left: 25 },
+                        xAxis: {
+                            type: 'category',
+                            data: ['09-01', '09-05', '09-10', '09-15'],
+                            axisLine: { show: false },
+                            axisTick: { show: false },
+                            axisLabel: { fontSize: 9, color: '#9ca3af' }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            splitLine: { lineStyle: { type: 'dashed' } },
+                            axisLabel: { fontSize: 9, color: '#9ca3af' }
+                        },
+                        series: [
+                            {
+                                data: [75, 88, 82, 85],
+                                type: 'line',
+                                smooth: true,
+                                symbol: 'none',
+                                itemStyle: { color: '#09C0D7' },
+                                lineStyle: { width: 3 }
+                            },
+                             {
+                                data: [78, 80, 79, 81],
+                                type: 'line',
+                                smooth: true,
+                                symbol: 'none',
+                                itemStyle: { color: '#F87171' },
+                                lineStyle: { width: 2, type: 'dashed' }
+                            }
+                        ]
+                    };
+                    myChart.setOption(option);
+                }
+            }, 100);
+        }
+
+        function renderFooter() {
+            const footer = document.getElementById('action-footer');
+            if (!footer) return;
+
+            if (currentState === 'uncollected') {
+                footer.innerHTML = `
+                    <button class="w-full py-3.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-full font-bold text-sm shadow-lg shadow-cyan-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="upload-cloud" class="w-5 h-5"></i> 上传并提交作业
+                    </button>
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-50 text-yellow-600 text-[10px] px-3 py-1 rounded-t-lg border-t border-x border-yellow-100">
+                        10月15日前提交可获 2 积分
+                    </div>
+                `;
+            } else if (currentState === 'grading') {
+                footer.innerHTML = `
+                    <div class="w-full py-3.5 bg-gray-100 text-gray-400 rounded-full font-bold text-sm text-center flex items-center justify-center gap-2 cursor-not-allowed">
+                         <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 老师正在批阅中...
+                    </div>
+                `;
+            } else {
+                // Graded
+                if (currentTab === 'analysis') {
+                    footer.innerHTML = `
+                         <button class="w-full py-3.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-full font-bold text-sm shadow-lg shadow-cyan-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i> 生成精准练习
+                        </button>
+                    `;
+                } else {
+                    footer.innerHTML = `
+                        <button class="w-full py-3.5 bg-gradient-to-r from-[#09C0D7] to-[#06A2B5] text-white rounded-full font-bold text-sm shadow-lg shadow-cyan-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i> 生成精准练习
+                        </button>
+                    `;
+                }
             }
             lucide.createIcons({ root: footer });
         }
-
-        function renderPerformance(state) {
-            let content = '';
-            if (state === 'graded') {
-                content = `
-                    <div class="animate-on-change">
-                        <div class="relative w-20 h-20 mx-auto mb-2 flex items-center justify-center">
-                            <!-- Simple SVG Circle Progress -->
-                            <svg class="w-full h-full transform -rotate-90">
-                                <circle cx="40" cy="40" r="36" stroke="#f3f4f6" stroke-width="6" fill="none" />
-                                <circle cx="40" cy="40" r="36" stroke="#09C0D7" stroke-width="6" fill="none" stroke-dasharray="226" stroke-dashoffset="100" stroke-linecap="round" />
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-[#09C0D7]">
-                                <span class="text-2xl font-black leading-none">55<span class="text-xs font-bold">%</span></span>
-                            </div>
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">正确率</div>
-                    </div>
-                    
-                    <div class="animate-on-change">
-                        <div class="w-16 h-16 rounded-full border-2 border-gray-100 flex items-center justify-center mx-auto mb-2 bg-gray-50">
-                             <span class="text-gray-700 font-bold text-sm">--<span class="text-[10px] font-normal">分钟</span></span>
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">作业时长</div>
-                    </div>
-
-                    <div class="animate-on-change">
-                        <div class="w-16 h-16 rounded-full border-2 border-gray-100 flex items-center justify-center mx-auto mb-2 bg-gray-50">
-                             <span class="text-gray-400 font-bold text-xl">-</span>
-                        </div>
-                        <div class="text-xs text-gray-500 font-medium">作业评价</div>
-                    </div>
-                `;
-            } else {
-                // Uncollected or Grading (No Data)
-                content = `
-                    <div class="flex flex-col items-center justify-center py-4 w-full animate-on-change">
-                        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-2">
-                            <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
-                        </div>
-                        <p class="text-sm text-gray-400">暂无作答数据</p>
-                    </div>
-                `;
-            }
-            sections.performance.innerHTML = content;
-            lucide.createIcons({ root: sections.performance });
-        }
-
-        function renderQuestions(state) {
-            let content = '';
-            if (state === 'graded') {
-                // Mock Question Data
-                const questions = [
-                    { id: '1.1', status: 'correct' },
-                    { id: '1.2', status: 'correct' },
-                    { id: '1.3', status: 'wrong' },
-                    { id: '1.4', status: 'correct' },
-                    { id: '1.5', status: 'wrong' },
-                    { id: '1.6', status: 'wrong' },
-                    { id: '2', status: 'wrong' },
-                    { id: '3.1', status: 'correct' },
-                    { id: '3.2', status: 'correct' },
-                ];
-
-                content = `<div class="flex flex-wrap gap-3 animate-on-change">`;
-                questions.forEach(q => {
-                    let colorClass = '';
-                    let icon = '';
-                    if (q.status === 'correct') {
-                        colorClass = 'bg-[#ECFDF5] text-[#059669] border-[#059669]/20';
-                        icon = '<div class="absolute -bottom-1 -right-1 bg-[#059669] text-white rounded-full p-[2px]"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg></div>';
-                    } else {
-                        colorClass = 'bg-[#FEF2F2] text-[#DC2626] border-[#DC2626]/20';
-                        icon = '<div class="absolute -bottom-1 -right-1 bg-[#DC2626] text-white rounded-full p-[2px]"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>';
-                    }
-
-                    content += `
-                        <div class="relative w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold border ${colorClass}">
-                            ${q.id}
-                            ${icon}
-                        </div>
-                    `;
-                });
-                content += `</div>`;
-            } else {
-                // Uncollected or Grading
-                 content = `
-                    <div class="flex flex-col items-center justify-center py-6 w-full animate-on-change">
-                        <div class="text-gray-300 mb-2">
-                            <i data-lucide="file-question" class="w-8 h-8"></i>
-                        </div>
-                        <p class="text-sm text-gray-400">暂无题目标记</p>
-                    </div>
-                `;
-            }
-            sections.questions.innerHTML = content;
-            lucide.createIcons({ root: sections.questions });
-        }
-
-        function renderImage(state) {
-            let content = '';
-            if (state === 'uncollected') {
-                content = `
-                    <div class="w-full aspect-[3/4] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-3 animate-on-change group cursor-pointer hover:bg-gray-100 transition-colors">
-                        <div class="w-16 h-16 rounded-full bg-blue-50 text-[#3B82F6] flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <i data-lucide="camera" class="w-8 h-8"></i>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-gray-800 font-bold">暂无作答图片</p>
-                            <p class="text-xs text-gray-400 mt-1">点击立即采集作业</p>
-                        </div>
-                        <button class="mt-2 px-6 py-2 bg-[#3B82F6] text-white text-xs font-bold rounded-full shadow-lg shadow-blue-200">
-                            立即采集
-                        </button>
-                    </div>
-                `;
-            } else {
-                // Grading or Graded (Show Image)
-                // Using a placeholder image div to simulate a document
-                content = `
-                    <div class="relative w-full rounded-xl overflow-hidden border border-gray-200 animate-on-change">
-                        <!-- Simulated Paper Image -->
-                        <div class="w-full aspect-[3/4] bg-white relative">
-                            <!-- Paper Texture/Content Simulation -->
-                            <div class="absolute inset-0 p-4 opacity-80">
-                                <div class="w-full h-4 bg-gray-100 rounded mb-4"></div>
-                                <div class="w-2/3 h-4 bg-gray-100 rounded mb-8"></div>
-                                
-                                <div class="space-y-6">
-                                    <div class="flex gap-4">
-                                        <div class="w-8 h-8 bg-gray-100 rounded-full"></div>
-                                        <div class="flex-1 space-y-2">
-                                            <div class="w-full h-2 bg-gray-100 rounded"></div>
-                                            <div class="w-full h-2 bg-gray-100 rounded"></div>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-4">
-                                        <div class="w-8 h-8 bg-gray-100 rounded-full"></div>
-                                        <div class="flex-1 space-y-2">
-                                            <div class="w-full h-2 bg-gray-100 rounded"></div>
-                                            <div class="w-full h-2 bg-gray-100 rounded"></div>
-                                        </div>
-                                    </div>
-                                     <div class="flex gap-4">
-                                        <div class="w-8 h-8 bg-gray-100 rounded-full"></div>
-                                        <div class="flex-1 space-y-2">
-                                            <div class="w-full h-2 bg-gray-100 rounded"></div>
-                                            <div class="w-full h-2 bg-gray-100 rounded"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Gradient Overlay at bottom -->
-                            <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/10 to-transparent"></div>
-                            
-                            <!-- Page Indicator Overlay -->
-                            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
-                                第 3 页
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            sections.image.innerHTML = content;
-            lucide.createIcons({ root: sections.image });
-        }
-
-        // Initialize with state from URL or default to 'graded'
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const state = urlParams.get('state') || 'graded';
-            
-            // Update the demo switcher active state visual if needed (optional)
-            // But importantly, render the page
-            setPageState(state);
-        });
-
     </script>
 </body>
 
