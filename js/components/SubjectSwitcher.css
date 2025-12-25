@@ -1,0 +1,45 @@
+/* SubjectSwitcher 基础组件样式 */
+.subject-tab {
+    position: relative;
+    font-size: 16px;
+    font-weight: 500;
+    color: #64748B;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+}
+
+.subject-tab.active {
+    font-size: 18px;
+    font-weight: 900;
+    color: #1A1C1E;
+}
+
+.subject-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 3px;
+    background: #09C0D7; /* 使用精准练习的主色调，也可以通过变量配置 */
+    border-radius: 4px;
+}
+
+/* 反色主题 (用于深色背景) */
+.subject-switcher-dark .subject-tab {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.subject-switcher-dark .subject-tab.active {
+    color: #FFFFFF;
+}
+
+.subject-switcher-dark .subject-tab.active::after {
+    background: #FFFFFF;
+}
+

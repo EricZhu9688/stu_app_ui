@@ -777,17 +777,17 @@
         // 切换孩子模态框
         function openSwitchChildModal() {
             document.getElementById('switch-child-modal').classList.remove('hidden');
-            // Hide parent navigation
+            // 通知父页面弹窗已打开，提高 iframe 层级
             if (window.parent) {
-                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
             }
         }
 
         function closeSwitchChildModal() {
             document.getElementById('switch-child-modal').classList.add('hidden');
-            // Show parent navigation
+            // 通知父页面弹窗已关闭，恢复 iframe 层级
             if (window.parent) {
-                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
             }
         }
 
@@ -981,10 +981,16 @@
         // 年级切换模态框逻辑
         function openGradeModal() {
             document.getElementById('grade-switch-modal').classList.remove('hidden');
+            if (window.parent) {
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
+            }
         }
 
         function closeGradeModal() {
             document.getElementById('grade-switch-modal').classList.add('hidden');
+            if (window.parent) {
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
+            }
         }
 
         function toggleSystem(sys) {
@@ -1023,17 +1029,17 @@
             const modal = document.getElementById('payment-modal');
             modal.classList.remove('hidden');
             lucide.createIcons();
-            // Hide parent navigation
+            // 通知父页面弹窗已打开，提高 iframe 层级
             if (window.parent) {
-                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
             }
         }
 
         function closePaymentModal() {
             document.getElementById('payment-modal').classList.add('hidden');
-            // Show parent navigation
+            // 通知父页面弹窗已关闭，恢复 iframe 层级
             if (window.parent) {
-                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
             }
         }
 

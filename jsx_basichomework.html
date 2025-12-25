@@ -7,6 +7,8 @@
     <title>基础性作业专栏</title>
     <script src="js/tailwind.min.js"></script>
     <script src="js/lucide.js"></script>
+    <link rel="stylesheet" href="js/components/SubjectSwitcher.css">
+    <script src="js/components/SubjectSwitcher.js"></script>
     <style>
         /* 1. 自定义主题色：#09C0D7 (Theme Color: Teal/Cyan) */
         :root {
@@ -139,18 +141,7 @@
             <!-- 顶部学科切换 -->
             <div class="overflow-x-auto scrollbar-hide">
                 <div class="flex gap-6 min-w-max px-2" id="subject-switcher">
-                    <button onclick="switchSubject(this, '数学')"
-                        class="pb-2 border-b-2 border-primary-500 text-primary-500 font-bold text-base transition-all">数学</button>
-                    <button onclick="switchSubject(this, '语文')"
-                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">语文</button>
-                    <button onclick="switchSubject(this, '英语')"
-                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">英语</button>
-                    <button onclick="switchSubject(this, '物理')"
-                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">物理</button>
-                    <button onclick="switchSubject(this, '化学')"
-                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">化学</button>
-                    <button onclick="switchSubject(this, '生物')"
-                        class="pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all">生物</button>
+                    <!-- 由 SubjectSwitcher 组件动态生成 -->
                 </div>
             </div>
 
@@ -516,6 +507,19 @@
         // 初始化图标
         lucide.createIcons();
 
+        // 初始化基础组件：学科切换
+        new SubjectSwitcher({
+            containerId: 'subject-switcher',
+            subjects: ['数学', '语文', '英语', '物理', '化学', '生物'],
+            initialSubject: '数学',
+            onChange: (subject) => {
+                console.log('切换学科:', subject);
+                document.getElementById('current-subject-title').textContent = `九年级${subject}（下）`;
+                renderProgress();
+                renderLessons(false);
+            }
+        });
+
         // 模拟数据结构
         const mockLessons = [
             { id: '1.1', title: '二次函数的概念', pages: 'P1-P5', problems: 15, status: 'completed', mistakes: 5, assigned: true, chapter: 1, allCorrect: false, allWrong: false, isListening: false },
@@ -690,9 +694,17 @@
             toggleEnhancedPracticeModal();
         }
 
-        // 增强练习选择弹窗开关
+        // 切换增强练习弹窗
         function toggleEnhancedPracticeModal() {
-            document.getElementById('enhanced-practice-modal').classList.toggle('hidden');
+            const modal = document.getElementById('enhanced-practice-modal');
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
+            } else {
+                modal.classList.add('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
+            }
         }
 
         // 个性化练习弹窗开关
@@ -732,9 +744,17 @@
             }
         }
 
-        // 教材切换弹窗开关
+        // 切换教材弹窗
         function toggleTextbookModal() {
-            document.getElementById('textbook-modal').classList.toggle('hidden');
+            const modal = document.getElementById('textbook-modal');
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
+            } else {
+                modal.classList.add('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
+            }
         }
 
         // 选择教材
@@ -756,20 +776,17 @@
             alert(`已切换至 ${version} ${currentGrade} 教材，正在刷新目录...`);
         }
 
-        // 专栏总览弹窗开关
+        // 切换总览弹窗
         function toggleAnalyticsModal() {
-            document.getElementById('analytics-modal').classList.toggle('hidden');
-        }
-
-        // 学科切换逻辑
-        function switchSubject(btn, subject) {
-            document.querySelectorAll('#subject-switcher button').forEach(b => {
-                b.className = 'pb-2 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 transition-all';
-            });
-            btn.className = 'pb-2 border-b-2 border-primary-500 text-primary-500 font-bold text-base transition-all';
-            document.getElementById('current-subject-title').textContent = `九年级${subject}（下）`;
-            renderProgress();
-            renderLessons(false);
+            const modal = document.getElementById('analytics-modal');
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
+            } else {
+                modal.classList.add('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
+            }
         }
 
         // 首次加载时渲染进度和列表

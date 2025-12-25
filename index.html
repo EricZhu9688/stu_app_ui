@@ -268,6 +268,16 @@
                     }
                 }
             }
+            if (event.data && event.data.type === 'SET_MODAL_ACTIVE') {
+                const activeIframe = document.querySelector('.page-frame.active');
+                if (activeIframe) {
+                    if (event.data.active) {
+                        activeIframe.style.zIndex = '100';
+                    } else {
+                        activeIframe.style.zIndex = '';
+                    }
+                }
+            }
         });
     </script>
 </body>

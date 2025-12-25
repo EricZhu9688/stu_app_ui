@@ -7,6 +7,8 @@
     <title>练习中心</title>
     <script src="js/tailwind.min.js"></script>
     <script src="js/lucide.js"></script>
+    <link rel="stylesheet" href="js/components/SubjectSwitcher.css">
+    <script src="js/components/SubjectSwitcher.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -53,31 +55,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* 学科 Tab 样式 (顶部) */
-        .subject-tab {
-            position: relative;
-            font-size: 16px;
-            font-weight: 500;
-            color: #64748B;
-            transition: all 0.3s ease;
-        }
-        .subject-tab.active {
-            font-size: 18px;
-            font-weight: 900;
-            color: #1A1C1E;
-        }
-        .subject-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 4px;
-        }
-
         /* 类型 Tab 样式 (内容区) */
         .type-tab {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -124,9 +101,7 @@
         <div class="relative h-12 flex items-center px-4">
             <!-- 左侧学科切换 -->
             <div class="flex items-end gap-6 h-full pb-1" id="subject-switcher">
-                <button onclick="switchSubject('语文')" class="subject-tab active" data-subject="语文">语文</button>
-                <button onclick="switchSubject('数学')" class="subject-tab" data-subject="数学">数学</button>
-                <button onclick="switchSubject('英语')" class="subject-tab" data-subject="英语">英语</button>
+                <!-- 由 SubjectSwitcher 组件动态生成 -->
             </div>
             
             <!-- 胶囊按钮 (Capsule Button) -->
@@ -553,21 +528,23 @@
 
         function initPage() {
             lucide.createIcons();
-            render();
-        }
-
-        function switchSubject(subject) {
-            currentSubject = subject;
             
-            // Update UI
-            document.querySelectorAll('.subject-tab').forEach(btn => {
-                if (btn.dataset.subject === subject) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
+            // 初始化基础组件：学科切换
+            new SubjectSwitcher({
+                containerId: 'subject-switcher',
+                initialSubject: currentSubject,
+                onChange: (subject) => {
+                    currentSubject = subject;
+                    render();
                 }
             });
 
+            render();
+        }
+
+        // switchSubject 函数已整合到组件回调中，此处仅为兼容原有逻辑（如有其他地方调用）
+        function switchSubject(subject) {
+            currentSubject = subject;
             render();
         }
 
@@ -876,17 +853,17 @@
             const modal = document.getElementById('payment-modal');
             modal.classList.remove('hidden');
             lucide.createIcons();
-            // Hide parent navigation
+            // 通知父页面弹窗已打开，提高 iframe 层级
             if (window.parent) {
-                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
             }
         }
 
         function closePaymentModal() {
             document.getElementById('payment-modal').classList.add('hidden');
-            // Show parent navigation
+            // 通知父页面弹窗已关闭，恢复 iframe 层级
             if (window.parent) {
-                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
             }
         }
 
@@ -960,7 +937,7 @@
                 updateFilterCountLabel();
                 
                 if (window.parent) {
-                    window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+                    window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
                 }
             } else {
                 // Close
@@ -971,7 +948,7 @@
                 }, 300);
                 
                 if (window.parent) {
-                    window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+                    window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
                 }
             }
         }
