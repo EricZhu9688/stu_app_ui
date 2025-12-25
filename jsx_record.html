@@ -10,95 +10,250 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+        :root {
+            --primary: #09C0D7;
+            --primary-light: rgba(9, 192, 215, 0.1);
+            --bg-soft: #F8F9FB;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            background-color: var(--bg-soft);
+            color: #1A1C1E;
+        }
+
+        /* 高级感渐变背景 */
+        .header-gradient {
+            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
         }
 
         .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
+        /* 隐藏滚动条 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
+        /* 进度条动画 */
         @keyframes progress-loading {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(250%); }
         }
+        .animate-progress-loading { animation: progress-loading 2s infinite linear; }
 
-        .animate-progress-loading {
-            animation: progress-loading 2s infinite linear;
+        /* Tab 激活态平滑过渡 */
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 学科 Tab 样式 (顶部) */
+        .subject-tab {
+            position: relative;
+            font-size: 16px;
+            font-weight: 500;
+            color: #64748B;
+            transition: all 0.3s ease;
+        }
+        .subject-tab.active {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1A1C1E;
+        }
+        .subject-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* 类型 Tab 样式 (内容区) */
+        .type-tab {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .type-tab.active {
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 卡片悬浮微动效 */
+        .record-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        .record-card:active {
+            transform: scale(0.985);
+            background-color: #FAFAFA;
+        }
+
+        /* 磨砂玻璃效果 */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
     </style>
 </head>
 
-<body class="pb-20" onload="initPage()">
+<body class="pb-20 bg-[#f8f9fa]" onload="initPage()">
 
-    <!-- 1. 顶部：学科切换 -->
-    <div class="bg-white pt-10 pb-4 px-6 relative z-10">
-        <!-- 顶部栏：学科切换 -->
-        <div class="flex justify-between items-center relative z-10">
-            <div class="flex bg-gray-100 p-1 rounded-full border border-gray-200" id="subject-switcher">
-                <button onclick="switchSubject('语文')" class="subject-btn px-6 py-1.5 rounded-full text-sm font-bold bg-white text-[#09C0D7] shadow-sm transition-all" data-subject="语文">语文</button>
-                <button onclick="switchSubject('数学')" class="subject-btn px-6 py-1.5 rounded-full text-sm font-bold text-gray-500 hover:bg-gray-200/50 transition-all" data-subject="数学">数学</button>
-                <button onclick="switchSubject('英语')" class="subject-btn px-6 py-1.5 rounded-full text-sm font-bold text-gray-500 hover:bg-gray-200/50 transition-all" data-subject="英语">英语</button>
+    <!-- 微信小程序原生导航栏模拟 (Simulated WeChat Native Nav Bar) -->
+    <div class="fixed top-0 left-0 right-0 bg-white z-[150] h-[88px] flex flex-col justify-end pb-1 border-b border-gray-50/50">
+        <!-- 状态栏占位 (Status Bar Placeholder) -->
+        <div class="h-10 w-full flex items-center px-6 justify-between opacity-80">
+            <span class="text-[14px] font-medium">9:41</span>
+            <div class="flex items-center gap-1.5">
+                <i data-lucide="signal" class="w-3.5 h-3.5"></i>
+                <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                <i data-lucide="battery" class="w-4 h-4"></i>
+            </div>
+        </div>
+        
+        <!-- 导航功能栏 (Nav Actions Bar) -->
+        <div class="relative h-12 flex items-center px-4">
+            <!-- 左侧学科切换 -->
+            <div class="flex items-end gap-6 h-full pb-1" id="subject-switcher">
+                <button onclick="switchSubject('语文')" class="subject-tab active" data-subject="语文">语文</button>
+                <button onclick="switchSubject('数学')" class="subject-tab" data-subject="数学">数学</button>
+                <button onclick="switchSubject('英语')" class="subject-tab" data-subject="英语">英语</button>
             </div>
             
-            <!-- 筛选入口 -->
-            <button onclick="toggleFilterModal()" class="flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full text-xs font-bold border border-gray-200 active:scale-95 transition-transform hover:bg-gray-200 text-gray-600">
-                <i data-lucide="filter" class="w-3.5 h-3.5"></i> 筛选
-            </button>
+            <!-- 胶囊按钮 (Capsule Button) -->
+            <div class="absolute right-4 flex items-center bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm gap-3 scale-90 origin-right">
+                <div class="flex items-center gap-1">
+                    <div class="w-1 h-1 rounded-full bg-black"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-black"></div>
+                    <div class="w-1 h-1 rounded-full bg-black"></div>
+                </div>
+                <div class="w-[1px] h-3.5 bg-gray-200"></div>
+                <div class="relative w-5 h-5 flex items-center justify-center">
+                    <div class="w-4 h-4 rounded-full border-[1.5px] border-black"></div>
+                    <div class="absolute w-1.5 h-1.5 rounded-full bg-black"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- 2. 类型 Tab 切换 -->
-    <div class="px-4 mt-2 sticky top-0 z-30 bg-white pb-2 pt-2">
-        <div class="flex items-center justify-between bg-gray-50 rounded-xl p-1 border border-gray-100 overflow-x-auto no-scrollbar" id="tab-container">
-            <button onclick="switchTab('consolidation')" class="tab-btn flex-1 min-w-[85px] py-2.5 rounded-lg transition-all whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="consolidation">
-                <span class="text-[13px] font-bold">错题巩固</span>
-                <span class="count-label text-[10px] opacity-60">0</span>
+    <!-- 顶部占位 (Spacer for fixed nav) -->
+    <div class="h-[88px] bg-white"></div>
+
+    <!-- 1. 类型 Tab 切换 & 筛选 (Combined) -->
+    <div class="px-4 sticky top-[88px] z-30 bg-white/90 backdrop-blur-md pb-4 pt-[12px] border-b border-[#F1F5F9] flex items-center gap-2">
+        <div class="flex-1 flex items-center justify-between bg-[#F1F5F9] rounded-2xl p-1 border border-[#E2E8F0]/30 shadow-inner" id="tab-container">
+            <button onclick="switchTab('consolidation')" class="tab-btn type-tab active flex-1 min-w-[70px] py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="consolidation">
+                <span class="text-[12px] font-black text-[#1E293B]">错题巩固</span>
+                <span class="count-label text-[9px] px-1.5 py-0.5 bg-white rounded-full text-[#09C0D7] font-black shadow-sm">0</span>
             </button>
-            <button onclick="switchTab('school')" class="tab-btn flex-1 min-w-[85px] py-2.5 rounded-lg transition-all whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="school">
-                <span class="text-[13px] font-bold">校本作业</span>
-                <span class="count-label text-[10px] opacity-60">0</span>
+            <button onclick="switchTab('school')" class="tab-btn type-tab flex-1 min-w-[70px] py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="school">
+                <span class="text-[12px] font-bold text-[#64748B]">校本作业</span>
+                <span class="count-label text-[9px] px-1.5 py-0.5 bg-transparent rounded-full text-[#64748B] font-medium">0</span>
             </button>
-            <button onclick="switchTab('essay')" class="tab-btn flex-1 min-w-[85px] py-2.5 rounded-lg transition-all whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="essay">
-                <span class="text-[13px] font-bold">习作</span>
-                <span class="count-label text-[10px] opacity-60">0</span>
+            <button onclick="switchTab('essay')" class="tab-btn type-tab flex-1 min-w-[70px] py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="essay">
+                <span class="text-[12px] font-bold text-[#64748B]">习作</span>
+                <span class="count-label text-[9px] px-1.5 py-0.5 bg-transparent rounded-full text-[#64748B] font-medium">0</span>
             </button>
-            <button onclick="switchTab('push')" class="tab-btn flex-1 min-w-[85px] py-2.5 rounded-lg transition-all whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="push">
-                <span class="text-[13px] font-bold">精准推送</span>
-                <span class="count-label text-[10px] opacity-60">0</span>
+            <button onclick="switchTab('push')" class="tab-btn type-tab flex-1 min-w-[70px] py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap flex flex-col items-center justify-center gap-0.5" data-tab="push">
+                <span class="text-[12px] font-bold text-[#64748B]">精准推送</span>
+                <span class="count-label text-[9px] px-1.5 py-0.5 bg-transparent rounded-full text-[#64748B] font-medium">0</span>
             </button>
         </div>
+        
+        <!-- 筛选入口 -->
+        <button onclick="toggleFilterModal()" class="flex flex-col items-center justify-center bg-white border border-[#E5E9F0] rounded-2xl w-[60px] h-[58px] shadow-sm active:scale-95 transition-all text-[#475569] shrink-0">
+            <i data-lucide="filter" class="w-4 h-4 text-[#09C0D7] mb-0.5"></i>
+            <span class="text-[11px] font-black">筛选</span>
+        </button>
     </div>
 
     <!-- 3. 内容列表区域 -->
     <div class="px-4 mt-2 space-y-4 min-h-[400px]" id="list-content">
         <!-- Content will be injected by JS -->
+    </div>
+
+    <!-- 筛选弹窗 (Filter Modal) -->
+    <div id="filter-modal" class="fixed inset-0 z-[100] hidden">
+        <!-- 背景遮罩 -->
+        <div onclick="toggleFilterModal()" class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"></div>
+        
+        <!-- 弹窗内容 (从底部滑出) -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] p-6 pb-10 transform transition-transform duration-300 translate-y-full" id="filter-panel">
+            <!-- 顶部装饰条 -->
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+            
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-black text-gray-800">筛选练习记录</h2>
+                <button onclick="toggleFilterModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 active:scale-90 transition-transform">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-8 overflow-y-auto max-h-[60vh] px-2 no-scrollbar">
+                <!-- 1. 年级 -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-4 bg-cyan-500 rounded-full"></div>
+                        <h3 class="font-bold text-gray-800 text-sm">年级</h3>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3" id="filter-grade">
+                        <button onclick="selectFilter('grade', '全部')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="全部">全部</button>
+                        <button onclick="selectFilter('grade', '一年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="一年级">一年级</button>
+                        <button onclick="selectFilter('grade', '二年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="二年级">二年级</button>
+                        <button onclick="selectFilter('grade', '三年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="三年级">三年级</button>
+                        <button onclick="selectFilter('grade', '四年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="四年级">四年级</button>
+                        <button onclick="selectFilter('grade', '五年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="五年级">五年级</button>
+                        <button onclick="selectFilter('grade', '六年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="六年级">六年级</button>
+                        <button onclick="selectFilter('grade', '初中')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="初中">初中</button>
+                    </div>
+                </div>
+
+                <!-- 2. 完成状态 -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-4 bg-cyan-500 rounded-full"></div>
+                        <h3 class="font-bold text-gray-800 text-sm">完成状态</h3>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3" id="filter-status">
+                        <button onclick="selectFilter('status', '全部')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="全部">全部</button>
+                        <button onclick="selectFilter('status', 'unsubmitted')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="unsubmitted">未开始</button>
+                        <button onclick="selectFilter('status', 'grading')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="grading">进行中</button>
+                        <button onclick="selectFilter('status', 'graded')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="graded">已完成</button>
+                    </div>
+                </div>
+
+                <!-- 3. 时间范围 -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-4 bg-cyan-500 rounded-full"></div>
+                        <h3 class="font-bold text-gray-800 text-sm">时间范围</h3>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3" id="filter-time">
+                        <button onclick="selectFilter('time', '全部')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="全部">全部</button>
+                        <button onclick="selectFilter('time', '本周')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="本周">本周</button>
+                        <button onclick="selectFilter('time', '本月')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="本月">本月</button>
+                        <button onclick="selectFilter('time', '近3个月')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="近3个月">近3个月</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部按钮 -->
+            <div class="flex gap-4 mt-10">
+                <button onclick="resetFilters()" class="flex-1 py-3.5 bg-rose-50 text-rose-500 rounded-2xl font-bold text-sm active:scale-95 transition-all">重置</button>
+                <button onclick="applyFilters()" class="flex-[2.5] bg-gradient-to-r from-cyan-400 to-cyan-500 text-white py-3.5 rounded-2xl font-black text-sm shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-95 transition-all">
+                    确认筛选 <span id="filter-count-label" class="opacity-70"></span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Payment Modal -->
@@ -246,6 +401,13 @@
         // State
         let currentSubject = '语文';
         let currentTab = 'consolidation';
+        
+        // Filter State
+        let activeFilters = {
+            grade: '全部',
+            status: '全部',
+            time: '全部'
+        };
 
         // Mock Data
         const mockData = [
@@ -398,11 +560,11 @@
             currentSubject = subject;
             
             // Update UI
-            document.querySelectorAll('.subject-btn').forEach(btn => {
+            document.querySelectorAll('.subject-tab').forEach(btn => {
                 if (btn.dataset.subject === subject) {
-                    btn.className = 'subject-btn px-6 py-1.5 rounded-full text-sm font-bold bg-white text-[#09C0D7] shadow-sm transition-all';
+                    btn.classList.add('active');
                 } else {
-                    btn.className = 'subject-btn px-6 py-1.5 rounded-full text-sm font-bold text-gray-500 hover:bg-gray-200/50 transition-all';
+                    btn.classList.remove('active');
                 }
             });
 
@@ -412,6 +574,10 @@
         function switchTab(tab) {
             currentTab = tab;
             render();
+        }
+
+        function previewPdf(title) {
+            window.location.href = `pdf_preview.html?title=${encodeURIComponent(title)}`;
         }
 
         function render() {
@@ -427,22 +593,22 @@
                     const countLabel = btn.querySelector('.count-label');
                     if (countLabel) countLabel.textContent = count;
                     
+                    const span = btn.querySelector('span:first-child');
+                    
                     if (tab === currentTab) {
-                        btn.className = 'tab-btn flex-1 min-w-[85px] py-2.5 rounded-lg bg-white text-cyan-600 shadow-sm transition-all whitespace-nowrap flex flex-col items-center justify-center gap-0.5 border border-gray-100';
-                        if (countLabel) countLabel.className = 'count-label text-[10px] text-cyan-500 font-medium';
+                        btn.className = 'tab-btn type-tab flex-1 min-w-[70px] py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap flex flex-col items-center justify-center gap-0.5 active';
+                        if (span) span.className = 'text-[12px] font-black text-[#1E293B]';
+                        if (countLabel) countLabel.className = 'count-label text-[9px] px-1.5 py-0.5 bg-white rounded-full text-[#09C0D7] font-black shadow-sm';
                     } else {
-                        btn.className = 'tab-btn flex-1 min-w-[85px] py-2.5 rounded-lg text-gray-500 hover:bg-gray-100/50 transition-all whitespace-nowrap flex flex-col items-center justify-center gap-0.5';
-                        if (countLabel) countLabel.className = 'count-label text-[10px] opacity-60';
+                        btn.className = 'tab-btn type-tab flex-1 min-w-[70px] py-2.5 rounded-xl transition-all duration-300 whitespace-nowrap flex flex-col items-center justify-center gap-0.5';
+                        if (span) span.className = 'text-[12px] font-bold text-[#64748B]';
+                        if (countLabel) countLabel.className = 'count-label text-[9px] px-1.5 py-0.5 bg-transparent rounded-full text-[#64748B] font-medium';
                     }
                 }
             });
 
             // 2. Filter Data
-            const filteredData = mockData.filter(item => {
-                if (item.subject !== currentSubject) return false;
-                if (item.type !== currentTab) return false;
-                return true;
-            });
+            const filteredData = getFilteredData();
 
             // Special Case: Essay Tab + Math Subject
             if (currentTab === 'essay' && currentSubject === '数学') {
@@ -475,85 +641,93 @@
             // 3. Render Items
             filteredData.forEach((item, index) => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden transition-all hover:shadow-md fade-in flex flex-col';
+                card.className = 'record-card bg-white rounded-3xl p-5 shadow-[0_4px_16px_rgba(0,0,0,0.03)] relative overflow-hidden transition-all hover:shadow-lg hover:shadow-cyan-500/5 fade-in flex flex-col';
                 card.style.animationDelay = `${index * 0.05}s`;
                 
                 // Generating State Styling (AI Processing)
                 if (item.status === 'generating') {
-                    card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden transition-all fade-in';
+                    card.className = 'record-card bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden transition-all duration-500 fade-in border border-[#F1F5F9]';
                     card.innerHTML = `
                         <!-- 背景光晕 -->
-                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-cyan-50/50 rounded-full blur-2xl animate-pulse"></div>
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-50/40 rounded-full blur-3xl animate-pulse"></div>
                         
-                        <div class="flex items-center gap-4 relative z-10">
+                        <div class="flex items-start gap-5 relative z-10 mb-6">
                             <!-- AI 动态图标容器 -->
                             <div class="relative">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-50 flex items-center justify-center relative overflow-hidden border border-cyan-100/50">
-                                    <i data-lucide="sparkles" class="w-6 h-6 text-cyan-500 animate-pulse"></i>
+                                <div class="w-14 h-14 rounded-[1.25rem] bg-gradient-to-br from-cyan-50 to-white flex items-center justify-center relative overflow-hidden border border-cyan-100/30 shadow-sm">
+                                    <i data-lucide="sparkles" class="w-7 h-7 text-cyan-500 animate-pulse"></i>
                                     <!-- 旋转边框 -->
-                                    <div class="absolute inset-0 border-2 border-transparent border-t-cyan-200 rounded-2xl animate-spin opacity-40"></div>
+                                    <div class="absolute inset-0 border-2 border-transparent border-t-cyan-200 rounded-[1.25rem] animate-spin opacity-40"></div>
                                 </div>
-                                <!-- 小气泡动效 -->
-                                <div class="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full border-2 border-white animate-bounce"></div>
+                                <!-- 状态指示点 -->
+                                <div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-cyan-400 rounded-full border-2 border-white shadow-sm animate-bounce"></div>
                             </div>
 
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-bold text-gray-800 text-sm">${item.title}</h3>
-                                    <span class="text-[10px] text-cyan-500 font-medium animate-pulse">AI 正在思考...</span>
-                                </div>
-                                
-                                <!-- 模拟进度条 -->
-                                <div class="w-full h-1.5 bg-gray-50 rounded-full overflow-hidden mb-2">
-                                    <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-progress-loading" style="width: 40%"></div>
+                                    <h3 class="font-black text-[#1E293B] text-[16px] tracking-tight truncate pr-4">${item.title}</h3>
+                                    <span class="text-[9px] text-cyan-500 font-black tracking-[0.1em] uppercase bg-cyan-50 px-1.5 py-0.5 rounded-md border border-cyan-100/50 animate-pulse">正在思考</span>
                                 </div>
                                 
                                 <div class="flex items-center gap-2">
-                                    <span class="bg-cyan-50 text-cyan-600 text-[10px] px-2 py-0.5 rounded-md font-medium flex items-center gap-1">
-                                        <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i>
-                                        智能组卷中
+                                    <span class="text-[11px] text-[#64748B] font-medium flex items-center gap-1.5">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 opacity-60"></i>
+                                        预计还需 1 分钟
                                     </span>
-                                    <span class="text-[10px] text-gray-400">预计还需 15 秒</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 底部发光条 -->
-                        <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-200 to-transparent opacity-50"></div>
+                        <!-- 进度展示区 -->
+                        <div class="bg-[#F8FAFC] rounded-2xl p-4 border border-[#F1F5F9]/60 relative z-10">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[12px] font-bold text-cyan-600 flex items-center gap-2">
+                                    <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+                                    智能组卷中...
+                                </span>
+                                <span class="text-[11px] font-black text-cyan-500/80 tracking-tighter">45%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-white rounded-full overflow-hidden border border-[#F1F5F9]">
+                                <div class="h-full bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 rounded-full animate-progress-loading shadow-[0_0_12px_rgba(34,211,238,0.3)]" style="width: 40%"></div>
+                            </div>
+                        </div>
+
+                        <!-- 底部装饰线 -->
+                        <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-100 to-transparent opacity-40"></div>
                     `;
                 } else {
                     // Icons and Colors
                     let icon = 'file-text';
-                    let iconBg = 'bg-cyan-100 text-cyan-600';
+                    let iconBg = 'bg-[#E0F7FA] text-[#00ACC1]';
                     if (item.type === 'essay') {
                         icon = 'pen-tool';
-                        iconBg = 'bg-green-100 text-green-600';
+                        iconBg = 'bg-[#E8F5E9] text-[#43A047]';
                     } else if (item.type === 'school') {
                         icon = 'book-open';
-                        iconBg = 'bg-blue-100 text-blue-600';
+                        iconBg = 'bg-[#E3F2FD] text-[#1E88E5]';
                     } else if (item.isVip) {
                         icon = 'crown';
-                        iconBg = 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white';
+                        iconBg = 'bg-gradient-to-br from-[#FFD54F] to-[#FB8C00] text-white';
                     }
 
                     // Header Tags
                     const tagHtml = (item.tags || []).map(tag => {
-                        let tagClass = 'bg-gray-100 text-gray-400';
-                        if (tag.includes('专项') || tag.includes('错题')) tagClass = 'bg-rose-50 text-rose-400 border border-rose-100';
-                        if (tag.includes('工整')) tagClass = 'bg-emerald-50 text-emerald-500 border border-emerald-100';
-                        if (tag.includes('同步')) tagClass = 'bg-blue-50 text-blue-500 border border-blue-100';
-                        return `<span class="${tagClass} text-[10px] px-2 py-0.5 rounded-md font-medium">${tag}</span>`;
+                        let tagClass = 'bg-[#F1F5F9] text-[#64748B]';
+                        if (tag.includes('专项') || tag.includes('错题')) tagClass = 'bg-[#FFF1F2] text-[#E11D48] border border-[#FFE4E6]';
+                        if (tag.includes('工整')) tagClass = 'bg-[#ECFDF5] text-[#059669] border border-[#D1FAE5]';
+                        if (tag.includes('同步')) tagClass = 'bg-[#EFF6FF] text-[#2563EB] border border-[#DBEAFE]';
+                        return `<span class="${tagClass} text-[10px] px-2.5 py-0.5 rounded-full font-bold tracking-tight">${tag}</span>`;
                     }).join('');
 
                     // Score Display
                     const scoreHtml = item.score ? `
-                        <div class="flex flex-col items-end">
+                        <div class="flex flex-col items-end bg-[#F8FAFC] p-2 rounded-2xl border border-[#F1F5F9] min-w-[64px]">
                             <div class="flex items-baseline gap-0.5">
-                                <span class="text-2xl font-black text-gray-900 leading-none">${item.score}</span>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                                <span class="text-[24px] font-black text-[#1E293B] leading-none tracking-tighter">${item.score}</span>
+                                <span class="text-[9px] text-[#94A3B8] font-bold uppercase tracking-tighter ml-0.5"></span>
                             </div>
-                            <div class="w-8 h-1 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                <div class="h-full bg-green-400" style="width: ${item.score}%"></div>
+                            <div class="w-full h-1 bg-white rounded-full mt-2 overflow-hidden border border-[#F1F5F9]">
+                                <div class="h-full bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.2)]" style="width: ${item.score}%"></div>
                             </div>
                         </div>
                     ` : '';
@@ -561,29 +735,29 @@
                     // Status Bar Logic
                     let statusBar = '';
                     if (item.statusMsg) {
-                        let barClass = 'bg-gray-50/80 text-gray-400 border border-gray-100';
-                        let badgeClass = 'text-rose-400 bg-rose-50 border border-rose-100';
-                        let badgeText = '未提交';
+                        let barClass = 'bg-[#F8FAFC] text-[#64748B] border border-[#F1F5F9]';
+                        let badgeClass = 'text-[#E11D48] bg-[#FFF1F2] border border-[#FFE4E6]';
+                        let badgeText = '未开始';
                         let iconHtml = '<i data-lucide="circle-dashed" class="w-3.5 h-3.5"></i>';
 
                         if (item.status === 'grading') {
-                            barClass = 'bg-blue-50/50 text-blue-500 border border-blue-100/50';
+                            barClass = 'bg-[#F0F9FF] text-[#0284C7] border border-[#E0F2FE]';
                             badgeClass = 'text-blue-500 bg-blue-50 border border-blue-200';
-                            badgeText = '批阅中';
+                            badgeText = '进行中';
                             iconHtml = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i>';
                         } else if (item.status === 'graded') {
                             barClass = 'bg-emerald-50/50 text-emerald-600 border border-emerald-100/50';
                             badgeClass = 'text-emerald-600 bg-emerald-50 border border-emerald-200';
-                            badgeText = '已批阅';
+                            badgeText = '已完成';
                             iconHtml = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>';
                         }
 
                         statusBar = `
-                            <div class="${barClass} rounded-xl p-3 flex justify-between items-center mb-4 backdrop-blur-sm">
-                                <div class="text-[11px] flex items-center gap-2 font-semibold">
+                            <div class="${barClass} rounded-2xl p-3.5 flex justify-between items-center mb-5 backdrop-blur-sm">
+                                <div class="text-[12px] flex items-center gap-2.5 font-bold">
                                     ${iconHtml} ${item.statusMsg}
                                 </div>
-                                <div class="${badgeClass} px-2 py-0.5 rounded-lg text-[10px] font-black tracking-wider">
+                                <div class="${badgeClass} px-2.5 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase">
                                     ${badgeText}
                                 </div>
                             </div>
@@ -595,18 +769,18 @@
                     if (item.type === 'essay') {
                         if (item.status === 'unsubmitted') {
                             actionHtml = `
-                                <button class="w-full py-3 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-xs font-black shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                    <i data-lucide="camera" class="w-4 h-4"></i> 拍照批改
+                                <button class="w-full py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                    <i data-lucide="camera" class="w-4.5 h-4.5"></i> 拍照批改
                                 </button>
                             `;
                         } else {
                             actionHtml = `
                                 <div class="flex gap-3">
-                                    <button class="flex-[0.45] py-3 border-2 border-gray-100 text-gray-500 hover:bg-gray-50 rounded-2xl text-xs font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> 重新提交
+                                    <button class="flex-[0.4] py-3.5 border border-gray-100 text-gray-500 hover:bg-gray-50 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                        <i data-lucide="rotate-cw" class="w-4 h-4"></i> 重新提交
                                     </button>
-                                    <button class="flex-1 py-3 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-xs font-black shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                                        <i data-lucide="${item.status === 'grading' ? 'eye' : 'file-bar-chart'}" class="w-3.5 h-3.5"></i> ${item.status === 'grading' ? '查看详情' : '查看评价'}
+                                    <button class="flex-1 py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                        <i data-lucide="${item.status === 'grading' ? 'eye' : 'file-bar-chart'}" class="w-4.5 h-4.5"></i> ${item.status === 'grading' ? '查看详情' : '查看评价'}
                                     </button>
                                 </div>
                             `;
@@ -614,56 +788,56 @@
                     } else if (item.type === 'school') {
                         if (item.status === 'unsubmitted') {
                             actionHtml = `
-                                <button class="w-full py-3 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-xs font-black shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                    <i data-lucide="pencil-line" class="w-4 h-4"></i> 拍照批改/标记错题
+                                <button class="w-full py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                    <i data-lucide="pencil-line" class="w-4.5 h-4.5"></i> 拍照批改/标记错题
                                 </button>
                             `;
                         } else if (item.status === 'grading') {
                             actionHtml = `
-                                <button class="w-full py-3 bg-white border-2 border-[#09C0D7] text-[#09C0D7] rounded-2xl text-xs font-black active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                    <i data-lucide="glasses" class="w-4 h-4"></i> 查看详情
+                                <button class="w-full py-3.5 bg-white border border-[#09C0D7]/30 text-[#09C0D7] rounded-2xl text-[13px] font-black active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 shadow-sm">
+                                    <i data-lucide="glasses" class="w-4.5 h-4.5"></i> 查看详情
                                 </button>
                             `;
                         } else {
                             actionHtml = `
                                 <div class="flex gap-3">
-                                    <button class="flex-[0.45] py-3 border-2 border-gray-100 text-gray-500 hover:bg-gray-50 rounded-2xl text-xs font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                                        <i data-lucide="history" class="w-3.5 h-3.5"></i> 错题巩固
+                                    <button class="flex-[0.4] py-3.5 border border-gray-100 text-gray-500 hover:bg-gray-50 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                        <i data-lucide="history" class="w-4 h-4"></i> 错题巩固
                                     </button>
-                                    <button class="flex-1 py-3 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-xs font-black shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                                        <i data-lucide="check-square" class="w-3.5 h-3.5"></i> 查看评价
+                                    <button class="flex-1 py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                        <i data-lucide="check-square" class="w-4.5 h-4.5"></i> 查看评价
                                     </button>
                                 </div>
                             `;
                         }
                     } else if (item.isVip) {
                         actionHtml = `
-                            <button onclick="openPaymentModal()" class="w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl text-xs font-black shadow-[0_8px_20px_-6px_rgba(245,158,11,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> 开通 VIP 解锁全部功能
+                            <button onclick="openPaymentModal()" class="w-full py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(245,158,11,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                <i data-lucide="sparkles" class="w-4.5 h-4.5"></i> 开通 VIP 解锁全部功能
                             </button>
                         `;
                     } else {
                         // Consolidation & Push
                         actionHtml = `
                             <div class="flex gap-3">
-                                <button class="flex-1 py-3 border-2 border-gray-100 text-gray-600 hover:bg-gray-50 rounded-2xl text-xs font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> 在线预览
+                                <button onclick="previewPdf('${item.title.replace(/'/g, "\\'")}')" class="flex-1 py-3.5 border border-gray-100 text-gray-600 hover:bg-gray-50 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="eye" class="w-4 h-4"></i> 在线预览
                                 </button>
-                                <button class="flex-1 py-3 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-xs font-black shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                                    <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> 下载PDF
+                                <button class="flex-1 py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="download-cloud" class="w-4.5 h-4.5"></i> 下载PDF
                                 </button>
                             </div>
                         `;
                     }
 
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center flex-shrink-0 shadow-sm border border-white/20">
-                                    <i data-lucide="${icon}" class="w-6 h-6"></i>
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="flex items-start gap-4 flex-1">
+                                <div class="w-13 h-13 rounded-[1.25rem] ${iconBg} flex items-center justify-center flex-shrink-0 shadow-sm border border-white/20">
+                                    <i data-lucide="${icon}" class="w-6.5 h-6.5"></i>
                                 </div>
-                                <div class="flex-1 pr-4">
-                                    <h3 class="font-black text-gray-800 text-[15px] mb-2 line-clamp-1 leading-tight">${item.title}</h3>
+                                <div class="flex-1 min-w-0 pr-2">
+                                    <h3 class="font-black text-gray-900 text-[16px] mb-2.5 line-clamp-2 leading-[1.3] tracking-tight">${item.title}</h3>
                                     <div class="flex flex-wrap items-center gap-2">
                                         ${tagHtml}
                                     </div>
@@ -673,7 +847,9 @@
                         </div>
                         
                         ${statusBar}
-                        ${actionHtml}
+                        <div class="mt-auto">
+                            ${actionHtml}
+                        </div>
                     `;
                 }
 
@@ -765,8 +941,119 @@
             }
         }
         
+        // 筛选逻辑
         function toggleFilterModal() {
-            alert("筛选功能开发中...");
+            const modal = document.getElementById('filter-modal');
+            const panel = document.getElementById('filter-panel');
+            
+            if (modal.classList.contains('hidden')) {
+                // Open
+                modal.classList.remove('hidden');
+                // Force layout for transition
+                setTimeout(() => {
+                    panel.classList.remove('translate-y-full');
+                    panel.classList.add('translate-y-0');
+                }, 10);
+                
+                // Update UI state based on current filters
+                updateFilterUI();
+                updateFilterCountLabel();
+                
+                if (window.parent) {
+                    window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+                }
+            } else {
+                // Close
+                panel.classList.add('translate-y-full');
+                panel.classList.remove('translate-y-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+                
+                if (window.parent) {
+                    window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+                }
+            }
+        }
+
+        function selectFilter(type, value) {
+            activeFilters[type] = value;
+            updateFilterUI();
+            updateFilterCountLabel();
+        }
+
+        function updateFilterUI() {
+            // Update buttons in each group
+            Object.keys(activeFilters).forEach(type => {
+                const group = document.getElementById(`filter-${type}`);
+                if (!group) return;
+                
+                const buttons = group.querySelectorAll('.filter-btn');
+                buttons.forEach(btn => {
+                    const isSelected = btn.getAttribute('data-value') === activeFilters[type];
+                    if (isSelected) {
+                        btn.classList.add('bg-cyan-50', 'text-cyan-600', 'border-cyan-200');
+                        btn.classList.remove('text-gray-500', 'bg-white', 'border-gray-100');
+                    } else {
+                        btn.classList.remove('bg-cyan-50', 'text-cyan-600', 'border-cyan-200');
+                        btn.classList.add('text-gray-500', 'bg-white', 'border-gray-100');
+                    }
+                });
+            });
+        }
+
+        function updateFilterCountLabel() {
+            const filtered = getFilteredData();
+            document.getElementById('filter-count-label').innerText = `(共 ${filtered.length} 条)`;
+        }
+
+        function resetFilters() {
+            activeFilters = {
+                grade: '全部',
+                status: '全部',
+                time: '全部'
+            };
+            updateFilterUI();
+            updateFilterCountLabel();
+        }
+
+        function applyFilters() {
+            render();
+            toggleFilterModal();
+        }
+
+        function getFilteredData() {
+            return mockData.filter(item => {
+                // 1. Tab & Subject (Existing logic)
+                if (item.type !== currentTab) return false;
+                if (item.subject !== currentSubject) return false;
+
+                // 2. Grade Filter
+                if (activeFilters.grade !== '全部') {
+                    // Check tags or title for grade
+                    const gradeStr = activeFilters.grade;
+                    const matchesGrade = (item.tags || []).some(t => t.includes(gradeStr)) || item.title.includes(gradeStr);
+                    if (!matchesGrade) return false;
+                }
+
+                // 3. Status Filter
+                if (activeFilters.status !== '全部') {
+                    if (item.status !== activeFilters.status) return false;
+                }
+
+                // 4. Time Filter
+                if (activeFilters.time !== '全部') {
+                    const now = new Date();
+                    const itemDate = new Date(item.date);
+                    const diffDays = (now - itemDate) / (1000 * 60 * 60 * 24);
+
+                    if (activeFilters.time === '本周' && diffDays > 7) return false;
+                    if (activeFilters.time === '本月' && diffDays > 30) return false;
+                    if (activeFilters.time === '近3个月' && diffDays > 90) return false;
+                }
+
+                return true;
+            });
         }
     </script>
 </body>
