@@ -24,11 +24,26 @@
 
         /* Custom Shapes */
         .header-bg {
-            background: linear-gradient(180deg, #26c6da 0%, #00bcd4 100%);
+            background: #ffffff;
+            /* Clean White Background */
             border-bottom-left-radius: 2rem;
             border-bottom-right-radius: 2rem;
             padding-bottom: 4rem;
             /* Space for overlap */
+        }
+
+        .header-bg::before {
+            /* Subtle top gradient for depth */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(180deg, #f0f9ff 0%, rgba(255, 255, 255, 0) 100%);
+            z-index: 0;
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
         }
 
         .card-shadow {
@@ -70,221 +85,399 @@
 <body class="pb-24" onload="initIcons()">
 
     <!-- Header Section -->
-    <header class="header-bg pt-6 pb-16 px-6 relative z-10">
+    <header class="header-bg pt-6 pb-16 px-6 relative z-10 overflow-hidden shadow-sm">
+        <!-- Decorative Background Blobs (Subtle) -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-100 opacity-40 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-50 opacity-50 rounded-full blur-2xl -ml-12 -mb-12 pointer-events-none"></div>
+
         <!-- Top Bar -->
-        <div class="flex justify-between items-center mb-6">
-            <!-- Grade Selector -->
+        <div class="flex justify-between items-center mb-6 relative z-20">
             <!-- Grade Selector -->
             <button onclick="openGradeModal()"
-                class="flex items-center space-x-1 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-white font-bold text-sm">
+                class="flex items-center space-x-1 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-gray-700 font-bold text-sm border border-gray-100 shadow-sm hover:bg-gray-50 transition-all">
                 <span id="current-grade-text">六年级 (上)</span>
-                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                <i data-lucide="chevron-down" class="w-4 h-4 opacity-60"></i>
             </button>
 
             <!-- Notification -->
-            <button class="relative p-2 bg-white/20 backdrop-blur-sm rounded-full text-white">
+            <button class="relative p-2.5 bg-white/80 backdrop-blur-md rounded-full text-gray-600 border border-gray-100 shadow-sm hover:bg-gray-50 transition-all">
                 <i data-lucide="bell" class="w-5 h-5"></i>
-                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
             </button>
         </div>
 
         <!-- User Info Row -->
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center relative z-20">
             <div class="flex items-center space-x-4">
-                <!-- Avatar -->
-                <div class="relative">
-                    <div class="w-16 h-16 rounded-full border-2 border-white overflow-hidden bg-yellow-200">
+                <!-- Avatar with Ring -->
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full blur opacity-40 group-hover:opacity-75 transition duration-500"></div>
+                    <div class="relative w-16 h-16 rounded-full border-2 border-white overflow-hidden bg-gray-50 shadow-md">
                         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar"
-                            class="w-full h-full">
+                            class="w-full h-full object-cover">
                     </div>
-
                 </div>
 
                 <!-- Name & Status -->
-                <div class="text-white">
-                    <div class="flex items-center space-x-2 mb-1">
-                        <h1 class="text-2xl font-bold" id="current-student-name">张小明</h1>
+                <div class="text-gray-800">
+                    <div class="flex items-center space-x-3 mb-1">
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900" id="current-student-name">张小明</h1>
                         <button onclick="openSwitchChildModal()"
-                            class="flex items-center space-x-1 bg-white/20 px-2 py-0.5 rounded-full text-xs hover:bg-white/30 transition">
+                            class="flex items-center space-x-1 bg-gray-100 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-medium border border-gray-200 text-gray-600 hover:bg-gray-200 transition-all">
                             <i data-lucide="refresh-cw" class="w-3 h-3"></i>
                             <span>切换孩子</span>
                         </button>
                     </div>
-                    <p class="text-sm opacity-90">今日还剩 3 项任务，加油！</p>
+                    
+                    <!-- School/Class Info Area -->
+                    <div id="school-info-container" class="h-8 flex items-center">
+                        <!-- State A: Has Class (Default) -->
+                        <div id="info-has-class" class="flex items-center text-gray-500 text-sm font-medium animate-fade-in">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 opacity-80 text-cyan-500"></i>
+                            <span id="school-text">上海万瑞隆小学 · 六年级2班</span>
+                        </div>
+
+                        <!-- State B: No Class/School (Hidden) -->
+                        <div id="info-no-class" class="hidden flex items-center space-x-2 animate-fade-in">
+                            <span class="text-sm text-gray-500 opacity-90">暂未加入班级</span>
+                            <button onclick="showMessage('跳转到班级绑定页面', true)" 
+                                class="flex items-center space-x-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md shadow-emerald-200 transition-colors">
+                                <i data-lucide="user-plus" class="w-3 h-3"></i>
+                                <span>立即加入</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Accuracy Card 暂时不要 -->
-            <!-- <div class="glass-card p-3 rounded-xl text-white text-center min-w-[80px]">
-                <p class="text-xs opacity-80 mb-1">本周准确率</p>
-                <p class="text-2xl font-bold">92%</p>
-            </div> -->
         </div>
     </header>
 
     <!-- Main Content (Overlapping) -->
     <main class="px-4 -mt-10 relative z-20">
 
-        <!-- Quick Services (Moved to Top) -->
-        <div class="mb-6">
-            <h3 class="text-base font-bold text-gray-800 mb-4">快速服务</h3>
-            <div class="grid grid-cols-2 gap-3">
-                <!-- Service 1 -->
-                <div onclick="goToErrorBook()" class="bg-white p-4 rounded-2xl card-shadow flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
-                        <i data-lucide="book-x" class="w-6 h-6"></i>
+        <!-- Quick Services / Parent Assistant (Big Tiles Style) -->
+        <div class="mb-8">
+            <div class="grid grid-cols-3 gap-3">
+                <!-- Service 1: Wrong Questions (Smart Logic) -->
+                <div onclick="handleErrorBookClick()" class="relative h-32 rounded-3xl p-4 bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-200 active:scale-95 transition-transform cursor-pointer overflow-hidden group">
+                    <!-- Content -->
+                    <div class="relative z-10 text-white">
+                        <h4 class="font-bold text-base mb-1">错题攻克</h4>
+                        <p class="text-xs text-blue-100 opacity-90" id="error-book-status">待攻克 12 题</p>
                     </div>
-                    <div>
-                        <p class="font-bold text-gray-800 text-sm">收集错题</p>
-                        <p class="text-xs text-gray-400">待消灭 12 题</p>
-                    </div>
-                </div>
-                <!-- Service 2 -->
-                <div onclick="viewLatestReport()"
-                    class="bg-white p-4 rounded-2xl card-shadow flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
-                        <i data-lucide="pie-chart" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <p class="font-bold text-gray-800 text-sm">学情报告</p>
-                        <p class="text-xs text-gray-400">周报更新</p>
+                    <!-- Decorative Icon -->
+                    <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-500"></div>
+                    <div class="absolute bottom-2 right-2 transform rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                         <!-- 3D Icon Simulation -->
+                         <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-sm">
+                            <i data-lucide="target" class="w-7 h-7 text-white drop-shadow-md"></i>
+                         </div>
                     </div>
                 </div>
-                <!-- Service 3 -->
-                <div onclick="goToIncentiveCenter()"
-                    class="bg-white p-4 rounded-2xl card-shadow flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500">
-                        <i data-lucide="gem" class="w-6 h-6"></i>
+                
+                <!-- Service 2: Report (Smart Logic) -->
+                <div onclick="handleReportClick()" class="relative h-32 rounded-3xl p-4 bg-gradient-to-br from-orange-400 to-orange-500 shadow-lg shadow-orange-200 active:scale-95 transition-transform cursor-pointer overflow-hidden group">
+                    <div class="relative z-10 text-white">
+                        <h4 class="font-bold text-base mb-1">成长周报</h4>
+                        <p class="text-xs text-orange-100 opacity-90" id="report-status">本周已更新</p>
                     </div>
-                    <div>
-                        <p class="font-bold text-gray-800 text-sm">积分乐园(暂不做)</p>
-                        <p class="text-xs text-gray-400">2400 币</p>
+                    <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-500"></div>
+                    <div class="absolute bottom-2 right-2 transform -rotate-6 group-hover:rotate-0 transition-transform duration-300">
+                         <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-sm">
+                            <i data-lucide="trending-up" class="w-7 h-7 text-white drop-shadow-md"></i>
+                         </div>
                     </div>
                 </div>
-                <!-- Service 4 -->
-                <div onclick="goToResourceCenter()"
-                    class="bg-white p-4 rounded-2xl card-shadow flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-500">
-                        <i data-lucide="layers" class="w-6 h-6"></i>
+
+                <!-- Service 3: Resources (Fixed) -->
+                <div onclick="goToResourceCenter()" class="relative h-32 rounded-3xl p-4 bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-teal-200 active:scale-95 transition-transform cursor-pointer overflow-hidden group">
+                    <div class="relative z-10 text-white">
+                        <h4 class="font-bold text-base mb-1">答案&听力</h4>
+                        <p class="text-xs text-emerald-100 opacity-90">基础性作业配套资源</p>
                     </div>
-                    <div>
-                        <p class="font-bold text-gray-800 text-sm">基础资源</p>
-                        <p class="text-xs text-gray-400">教辅答案/听力</p>
+                    <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-500"></div>
+                    <div class="absolute bottom-2 right-2 transform rotate-6 group-hover:rotate-0 transition-transform duration-300">
+                         <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-sm">
+                            <i data-lucide="headphones" class="w-7 h-7 text-white drop-shadow-md"></i>
+                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- AI Smart Companion (New Design) -->
-        <div onclick="window.location.href='ai_companion.html'" class="relative bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-6 card-shadow mb-6 overflow-hidden cursor-pointer group">
+        <!-- AI Smart Companion (Expanded & Optimized) -->
+        <div onclick="window.location.href='ai_companion.html'" class="relative bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-5 card-shadow mb-6 overflow-hidden cursor-pointer group">
             <!-- Decorative Background -->
             <div class="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
             <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-32 h-32 bg-purple-400 opacity-20 rounded-full blur-2xl"></div>
             
-            <div class="relative z-10 flex justify-between items-center">
-                <div class="text-white">
+            <!-- Top Section: Title & Tools -->
+            <div class="relative z-10 flex justify-between items-start mb-4">
+                <div class="text-white pt-1">
                     <h3 class="text-xl font-bold mb-1 flex items-center gap-2">
                         <i data-lucide="sparkles" class="w-5 h-5 text-yellow-300"></i>
                         AI 智慧伴学
                     </h3>
-                    <p class="text-indigo-100 text-sm mb-4">您的专属数字助教，随时解答疑惑</p>
+                    <p class="text-indigo-100 text-sm mb-3">您的专属数字助教，随时解答疑惑</p>
                     
                     <div class="flex space-x-2">
-                         <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white border border-white/10">作文批改</div>
-                         <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white border border-white/10">拍照答疑</div>
+                         <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white border border-white/10 hover:bg-white/30 transition-colors">作文批改</div>
+                         <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-white border border-white/10 hover:bg-white/30 transition-colors">拍照答疑</div>
                     </div>
                 </div>
                 
-                <!-- 3D/Digital Human Illustration -->
-                <div class="w-24 h-24 flex items-center justify-center group-hover:rotate-3 transition-transform">
+                <!-- Digital Human -->
+                <div class="w-28 h-28 flex items-center justify-center group-hover:rotate-3 transition-transform -mt-2 -mr-2">
                      <img src="images/ai_avatar.png" alt="AI" class="w-full h-full object-contain drop-shadow-lg">
                 </div>
             </div>
+
+            <!-- Bottom Section: Smart Recommendations (Dynamic) -->
+            <div class="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10">
+                <div class="flex items-center justify-between mb-2.5 px-1">
+                    <span class="text-white text-xs font-bold opacity-90 flex items-center gap-1">
+                        <i data-lucide="thumbs-up" class="w-3 h-3"></i> 智能推荐
+                    </span>
+                    <span class="text-[10px] text-indigo-200 bg-white/10 px-1.5 py-0.5 rounded">根据学情生成</span>
+                </div>
+                
+                <!-- Dynamic Content Container -->
+                <div id="ai-recommendations-list" class="space-y-2">
+                    <!-- Item 1 -->
+                    <div class="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-sm hover:bg-white transition-colors relative overflow-hidden cursor-pointer" onclick="event.stopPropagation(); openPaymentModal()">
+                        <!-- VIP Badge -->
+                        <div class="absolute top-0 right-0">
+                            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg shadow-sm flex items-center gap-0.5">
+                                <i data-lucide="crown" class="w-2.5 h-2.5"></i> VIP
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-500">
+                                <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">高频错题强化</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">专家推荐</span>
+                                    <span class="text-[10px] text-gray-400">引导家长查看下载打印</span>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="lock" class="w-4 h-4 text-orange-400 mr-1"></i>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-sm hover:bg-white transition-colors cursor-pointer" onclick="event.stopPropagation(); showMessage('播放英语听力精选内容')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-500">
+                                <i data-lucide="headphones" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">练习英语听力</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">精选内容</span>
+                                    <span class="text-[10px] text-gray-400">磨耳朵</span>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
             
-            <!-- Enter Button Indicator -->
-            <div class="absolute bottom-4 right-4 bg-white text-indigo-600 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            <!-- Arrow Icon -->
+            <div class="absolute top-4 right-4 bg-white/20 text-white rounded-full p-1.5 opacity-60 hover:opacity-100 transition-opacity">
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
             </div>
         </div>
 
-        <!-- Recent Recommendations (Formerly Task Section) (Bottom) -->
+        <!-- Recent Homework & AI Usage -->
         <div class="mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-gray-800">近期推荐</h3>
-                <button onclick="toggleNoHomework()"
-                    class="flex items-center space-x-1 bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">
-                    <i data-lucide="refresh-ccw" class="w-3 h-3"></i>
-                    <span>模拟: 切换无作业状态</span>
-                </button>
-            </div>
-
             <div class="flex items-center space-x-4 mb-4 border-b border-gray-100">
-                <button id="tab-today" class="text-lg font-bold text-gray-800 border-b-2 border-cyan-500 pb-2"
-                    onclick="switchTaskTab('today')">今日任务</button>
-                <button id="tab-week" class="text-lg text-gray-400 pb-2" onclick="switchTaskTab('week')">本周计划</button>
+                <button id="tab-homework" class="text-lg font-bold text-gray-800 border-b-2 border-cyan-500 pb-2"
+                    onclick="switchTaskTab('homework')">近期作业</button>
+                <button id="tab-ai-history" class="text-lg text-gray-400 pb-2" onclick="switchTaskTab('ai_history')">近期AI记录</button>
             </div>
 
-            <!-- Task List Content -->
-            <div id="today-tasks-list">
-                <!-- Task 1 -->
-                <div class="bg-white rounded-2xl p-4 card-shadow mb-3 flex justify-between items-center">
-                    <div class="flex items-start space-x-3">
-                        <div class="w-1 bg-red-400 h-10 rounded-full mt-1"></div>
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="bg-red-100 text-red-500 text-xs px-1.5 py-0.5 rounded">必做</span>
-                                <span class="text-gray-500 text-xs">数学 · 分数乘法</span>
+            <!-- Homework List Content -->
+            <div id="homework-list" class="space-y-4">
+                <!-- 1. Writing Task (习作) -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative group active:scale-[0.99] transition-all duration-200">
+                    <div class="flex items-start gap-4">
+                        <!-- Icon Box -->
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex-shrink-0 flex items-center justify-center border border-orange-200/50">
+                            <i data-lucide="pen-tool" class="w-6 h-6 text-orange-500"></i>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start mb-1">
+                                <h4 class="font-bold text-gray-900 text-base truncate pr-2">家乡的风俗</h4>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-green-50 text-green-600 border border-green-100">
+                                        得分 A
+                                    </span>
+                                </div>
                             </div>
-                            <h4 class="font-bold text-gray-800">专项强化练习卷 A</h4>
-                            <div class="flex items-center mt-1 space-x-2">
-                                <span class="text-xs text-orange-500 bg-orange-50 px-1.5 rounded flex items-center">
-                                    <i data-lucide="coins" class="w-3 h-3 mr-1"></i> +50 金币
-                                </span>
+                            
+                            <!-- Tags & Meta -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded border border-gray-200">语文</span>
+                                <span class="bg-orange-50 text-orange-600 text-[10px] px-1.5 py-0.5 rounded border border-orange-100">习作</span>
+                            </div>
+                            
+                            <p class="text-xs text-gray-500 line-clamp-1 leading-relaxed">1.选准事例，可以介绍一种风俗，也可也写一写你参加一次风俗活动的经历...</p>
+                            
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
+                                <span class="text-[10px] text-gray-400 font-medium">12-23 09:56</span>
+                                <button class="text-xs text-gray-400 flex items-center gap-1 hover:text-cyan-500 transition-colors">
+                                    查看详情 <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <button onclick="goToErrorBook()"
-                        class="bg-red-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md shadow-red-200">去完成</button>
                 </div>
 
-                <!-- Task 2 -->
-                <div class="bg-white rounded-2xl p-4 card-shadow mb-3 flex justify-between items-center">
-                    <div class="flex items-start space-x-3">
-                        <div class="w-1 bg-cyan-400 h-10 rounded-full mt-1"></div>
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="bg-cyan-100 text-cyan-600 text-xs px-1.5 py-0.5 rounded">选做</span>
-                                <span class="text-gray-500 text-xs">语文 · 阅读</span>
+                <!-- 2. Workbook Homework (教辅作业) -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative group active:scale-[0.99] transition-all duration-200">
+                    <div class="flex items-start gap-4">
+                        <!-- Icon Box -->
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 flex-shrink-0 flex items-center justify-center border border-blue-200/50">
+                            <i data-lucide="book-open" class="w-6 h-6 text-blue-500"></i>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start mb-1">
+                                <h4 class="font-bold text-gray-900 text-base truncate pr-2">6 狼牙山五壮士</h4>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-500 border border-red-100 animate-pulse">
+                                        未提交
+                                    </span>
+                                </div>
                             </div>
-                            <h4 class="font-bold text-gray-800">课外阅读打卡 30分钟</h4>
+                            
+                            <!-- Tags & Meta -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded border border-gray-200">语文</span>
+                                <span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded border border-blue-100">基础性作业</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 text-xs text-gray-500 font-medium">
+                                <span class="flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3 text-gray-400"></i> P16-P20</span>
+                                <span class="flex items-center gap-1"><i data-lucide="list-checks" class="w-3 h-3 text-gray-400"></i> 15题</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
+                                <span class="text-[10px] text-gray-400 font-medium">12-22 16:37</span>
+                                <button class="text-xs font-bold text-cyan-500 flex items-center gap-1 hover:text-cyan-600 transition-colors">
+                                    去完成 <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <button onclick="goToResourceCenter()"
-                        class="bg-cyan-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md shadow-cyan-200">去阅读</button>
+                </div>
+
+                <!-- 3. Personalized Homework (个性化作业) -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative group active:scale-[0.99] transition-all duration-200">
+                    <div class="flex items-start gap-4">
+                        <!-- Icon Box -->
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 flex-shrink-0 flex items-center justify-center border border-purple-200/50">
+                            <i data-lucide="layers" class="w-6 h-6 text-purple-500"></i>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start mb-1">
+                                <h4 class="font-bold text-gray-900 text-base truncate pr-2">语文智能组卷</h4>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-500 border border-red-100">
+                                        未提交
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Tags & Meta -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded border border-gray-200">语文</span>
+                                <span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded border border-purple-100">校本作业</span>
+                            </div>
+                            
+                            <p class="text-xs text-gray-500 mb-1">来源: 2025-12-18 校本题库</p>
+                            
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
+                                <span class="text-[10px] text-gray-400 font-medium">12-18 11:11</span>
+                                <button class="text-xs font-bold text-cyan-500 flex items-center gap-1 hover:text-cyan-600 transition-colors">
+                                    去完成 <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Week Tasks (Placeholder) -->
-            <div id="week-tasks-list"
-                class="hidden text-center p-8 bg-white rounded-2xl border border-gray-200 card-shadow">
-                <i data-lucide="calendar" class="w-10 h-10 mx-auto mb-3 text-cyan-500"></i>
-                <p class="text-lg font-bold text-gray-700">本周计划加载中...</p>
-                <p class="text-sm text-gray-500 mt-2">这里将展示您的学科长期目标、待完成的章节测试以及平台推荐的进阶资源。</p>
+            <!-- AI History List (New) -->
+            <div id="ai-history-list" class="hidden space-y-3">
+                 <!-- Record 1 -->
+                 <div class="bg-white rounded-2xl p-4 card-shadow flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center text-violet-600">
+                            <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">作文批改助手</h4>
+                            <p class="text-xs text-gray-500">今天 14:30 · 生成了详细点评</p>
+                        </div>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                 </div>
+
+                 <!-- Record 2 -->
+                 <div class="bg-white rounded-2xl p-4 card-shadow flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                            <i data-lucide="camera" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">拍照答疑</h4>
+                            <p class="text-xs text-gray-500">昨天 19:12 · 解析了2道数学题</p>
+                        </div>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                 </div>
+                 
+                 <!-- Record 3 -->
+                 <div class="bg-white rounded-2xl p-4 card-shadow flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">口语陪练</h4>
+                            <p class="text-xs text-gray-500">周一 20:00 · 练习时长 15分钟</p>
+                        </div>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                 </div>
             </div>
 
             <!-- No Homework State (Hidden by default) -->
             <div id="no-task-today" class="hidden bg-white rounded-3xl p-8 card-shadow text-center">
-                <div class="w-24 h-24 bg-gray-50 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <img src="https://cdn-icons-png.flaticon.com/512/744/744922.png" alt="Party"
-                        class="w-16 h-16 opacity-80">
+                <div class="w-24 h-24 bg-gray-50 rounded-full mx-auto mb-4 flex items-center justify-center text-gray-300">
+                    <i data-lucide="inbox" class="w-12 h-12"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">太棒了，今日任务已清空！</h3>
-                <p class="text-sm text-gray-500 mb-6">保持好习惯，利用空闲时间巩固一下薄弱点吧。</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">暂无近期作业</h3>
+                <p class="text-sm text-gray-500 mb-6">当前暂未收到学校发布的作业任务</p>
                 <div class="flex justify-center space-x-4">
-                    <button onclick="goToErrorBook()"
-                        class="border border-cyan-400 text-cyan-500 px-6 py-2 rounded-full font-bold text-sm">查看错题</button>
-                    <button onclick="goToResourceCenter()"
-                        class="bg-cyan-400 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md shadow-cyan-200">自主练习</button>
+                    <button onclick="window.location.href='ai_companion.html'"
+                        class="bg-cyan-400 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md shadow-cyan-200">去体验 AI</button>
                 </div>
             </div>
         </div>
@@ -301,7 +494,7 @@
 
             <div class="space-y-3 mb-6">
                 <!-- Case 1: School + Class (Current) -->
-                <div class="border-2 border-cyan-400 bg-cyan-50 rounded-2xl p-3 flex items-center justify-between">
+                <div id="student-card-ming" onclick="switchStudent('张小明')" class="border-2 border-cyan-400 bg-cyan-50 rounded-2xl p-3 flex items-center justify-between cursor-pointer transition-colors">
                     <div class="flex items-center space-x-3">
                         <div class="relative">
                             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
@@ -310,19 +503,20 @@
                         </div>
                         <div>
                             <div class="flex items-center space-x-2">
-                                <span class="font-bold text-cyan-600">张小明 (当前)</span>
+                                <span class="font-bold text-cyan-600">张小明</span>
+                                <span class="bg-cyan-100 text-cyan-600 text-[10px] px-1 rounded">数据丰富</span>
                             </div>
                             <p class="text-xs text-gray-500">上海万瑞隆小学 · 六年级2班</p>
                         </div>
                     </div>
-                    <div class="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-white">
+                    <div class="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-white" id="check-mark-ming">
                         <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                 </div>
 
                 <!-- Case 2: School Only (No Class) -->
-                <div onclick="switchStudent('张小红')"
-                    class="border border-gray-100 rounded-2xl p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                <div id="student-card-hong" onclick="switchStudent('张小红')"
+                    class="border border-gray-100 rounded-2xl p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors">
                     <div class="flex items-center space-x-3">
                         <div class="relative">
                             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Annie"
@@ -332,15 +526,19 @@
                         <div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-gray-800">张小红</span>
+                                <span class="bg-gray-100 text-gray-500 text-[10px] px-1 rounded">暂无数据</span>
                             </div>
-                            <p class="text-xs text-gray-500">上海万瑞隆小学 · 暂无班级信息</p>
+                            <p class="text-xs text-gray-500">模拟: 无错题、无周报场景</p>
                         </div>
+                    </div>
+                    <div class="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-white hidden" id="check-mark-hong">
+                        <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                 </div>
 
                 <!-- Case 3: No School -->
-                <div onclick="switchStudent('王小刚')"
-                    class="border border-gray-100 rounded-2xl p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                <div id="student-card-gang" onclick="switchStudent('王小刚')"
+                    class="border border-gray-100 rounded-2xl p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors">
                     <div class="flex items-center space-x-3">
                         <div class="relative">
                             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bob"
@@ -353,6 +551,9 @@
                             </div>
                             <p class="text-xs text-gray-500">暂无学校信息</p>
                         </div>
+                    </div>
+                    <div class="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center text-white hidden" id="check-mark-gang">
+                        <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                 </div>
             </div>
@@ -445,86 +646,336 @@
             lucide.createIcons();
         }
 
+        // --- Mock Data & Smart Logic ---
+
+        // Mock State (Simulating backend data)
+        let userState = {
+            errorCount: 12, 
+            hasWeeklyReport: true 
+        };
+
+        // 1. Error Book Logic
+        function handleErrorBookClick() {
+            if (userState.errorCount > 0) {
+                // Scenario A: Has error questions -> Go to practice
+                console.log(`Going to error book with ${userState.errorCount} questions.`);
+                window.parent.postMessage({ type: 'SWITCH_TAB', index: 1 }, '*'); 
+            } else {
+                // Scenario B: No error questions -> Prompt to take photo
+                showMessage("太棒了！暂无待攻克错题。\n\n遇到难题记得拍照录入哦！", true);
+                // Optional: Redirect to photo entry page
+            }
+        }
+
+        // Update Error Book UI based on state
+        function updateErrorBookUI() {
+            const statusEl = document.getElementById('error-book-status');
+            if (userState.errorCount > 0) {
+                statusEl.textContent = `待攻克 ${userState.errorCount} 题`;
+            } else {
+                statusEl.textContent = "拍照录入";
+            }
+        }
+
+        // 2. Report Logic
+        function handleReportClick() {
+            if (userState.hasWeeklyReport) {
+                // Scenario A: Has report -> View report
+                console.log("Viewing weekly report.");
+                alert("正在打开本周成长周报... (模拟跳转)");
+            } else {
+                // Scenario B: No report -> Guide to study
+                const confirmStudy = confirm("本周学习数据积累中... 完成1次作业即可解锁报告。\n\n要去练习吗？");
+                if (confirmStudy) {
+                    window.parent.postMessage({ type: 'SWITCH_TAB', index: 2 }, '*'); 
+                }
+            }
+        }
+
+        // Update Report UI based on state
+        function updateReportUI() {
+            const statusEl = document.getElementById('report-status');
+            if (userState.hasWeeklyReport) {
+                statusEl.textContent = "本周已更新";
+            } else {
+                statusEl.textContent = "数据积累中";
+            }
+        }
+
+        // 3. Resource Logic (Fixed)
+        function goToResourceCenter() {
+            console.log("Going to resource center.");
+            alert("正在前往伴读资源中心... (模拟跳转)");
+        }
+        
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            updateErrorBookUI();
+            updateReportUI();
+        });
+
+        // --- End Smart Logic ---
+
         // 模拟页面跳转
-        function showMessage(title) {
+        function showMessage(title, isModal = false) {
             const message = document.createElement('div');
-            message.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            message.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in';
             message.innerHTML = `
-                <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center">
-                    <p class="text-xl font-bold text-cyan-500 mb-3">${title}</p>
-                    <p class="text-sm text-gray-600">这是模拟的页面跳转。</p>
-                    <button onclick="this.parentNode.parentNode.remove()" class="mt-4 bg-cyan-500 text-white px-4 py-2 rounded-lg interactive-button shadow-md hover:bg-cyan-600">
-                        确定
+                <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center transform transition-all scale-100">
+                    <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="${isModal ? 'camera' : 'info'}" class="w-6 h-6 text-cyan-600"></i>
+                    </div>
+                    <p class="text-lg font-bold text-gray-800 mb-2">${title.split('\n')[0]}</p>
+                    ${title.includes('\n') ? `<p class="text-sm text-gray-500 mb-4">${title.split('\n')[2] || ''}</p>` : ''}
+                    <button onclick="this.parentNode.parentNode.remove()" class="w-full bg-cyan-500 text-white px-4 py-2.5 rounded-xl font-bold shadow-lg shadow-cyan-200 hover:bg-cyan-600 transition-colors">
+                        我知道了
                     </button>
                 </div>
             `;
             document.body.appendChild(message);
+            lucide.createIcons();
         }
 
         function goToAITool(toolName) { showMessage(`跳转到 ${toolName} 页面`); }
         function goToErrorBook() { window.parent.postMessage({ type: 'SWITCH_TAB', index: 2 }, '*'); }
-        function goToResourceCenter() { window.parent.postMessage({ type: 'SWITCH_TAB', index: 1 }, '*'); }
         function goToIncentiveCenter() { showMessage('跳转到积分中心'); }
         function viewLatestReport() { showMessage('正在加载最新周/月报告...'); }
 
         // 切换任务标签
         function switchTaskTab(tab) {
-            const todayList = document.getElementById('today-tasks-list');
-            const weekList = document.getElementById('week-tasks-list');
+            const homeworkList = document.getElementById('homework-list');
+            const aiHistoryList = document.getElementById('ai-history-list');
             const noTask = document.getElementById('no-task-today');
-            const tabToday = document.getElementById('tab-today');
-            const tabWeek = document.getElementById('tab-week');
+            const tabHomework = document.getElementById('tab-homework');
+            const tabAiHistory = document.getElementById('tab-ai-history');
 
-            if (tab === 'today') {
-                tabToday.className = 'text-lg font-bold text-gray-800 border-b-2 border-cyan-500 pb-2';
-                tabWeek.className = 'text-lg text-gray-400 pb-2';
-                weekList.classList.add('hidden');
+            if (tab === 'homework') {
+                tabHomework.className = 'text-lg font-bold text-gray-800 border-b-2 border-cyan-500 pb-2';
+                tabAiHistory.className = 'text-lg text-gray-400 pb-2';
+                aiHistoryList.classList.add('hidden');
 
-                // Check simulation state
-                if (document.getElementById('no-task-today').dataset.simulated === 'true') {
-                    todayList.classList.add('hidden');
+                // Check current student to decide visibility
+                const currentStudent = document.getElementById('current-student-name').textContent;
+                const hasHomework = (currentStudent === '张小明'); 
+
+                if (!hasHomework) {
+                    homeworkList.classList.add('hidden');
                     noTask.classList.remove('hidden');
                 } else {
-                    todayList.classList.remove('hidden');
+                    homeworkList.classList.remove('hidden');
                     noTask.classList.add('hidden');
                 }
             } else {
-                tabWeek.className = 'text-lg font-bold text-gray-800 border-b-2 border-cyan-500 pb-2';
-                tabToday.className = 'text-lg text-gray-400 pb-2';
-                todayList.classList.add('hidden');
+                tabAiHistory.className = 'text-lg font-bold text-gray-800 border-b-2 border-cyan-500 pb-2';
+                tabHomework.className = 'text-lg text-gray-400 pb-2';
+                homeworkList.classList.add('hidden');
                 noTask.classList.add('hidden');
-                weekList.classList.remove('hidden');
-            }
-        }
-
-        // 模拟无作业状态
-        function toggleNoHomework() {
-            const noTask = document.getElementById('no-task-today');
-            const todayList = document.getElementById('today-tasks-list');
-            const isSimulated = noTask.dataset.simulated === 'true';
-
-            if (isSimulated) {
-                noTask.dataset.simulated = 'false';
-                switchTaskTab('today'); // Reset to normal
-            } else {
-                noTask.dataset.simulated = 'true';
-                switchTaskTab('today'); // Show empty state
+                aiHistoryList.classList.remove('hidden');
             }
         }
 
         // 切换孩子模态框
         function openSwitchChildModal() {
             document.getElementById('switch-child-modal').classList.remove('hidden');
+            // Hide parent navigation
+            if (window.parent) {
+                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+            }
         }
 
         function closeSwitchChildModal() {
             document.getElementById('switch-child-modal').classList.add('hidden');
+            // Show parent navigation
+            if (window.parent) {
+                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+            }
+        }
+
+        // 更新AI推荐内容逻辑
+        function updateAIRecommendations(name) {
+            const container = document.getElementById('ai-recommendations-list');
+            
+            if (name === '张小红') {
+                // Scenario B: Recommendations for Xiaohong
+                container.innerHTML = `
+                    <div onclick="event.stopPropagation(); showMessage('引导学生阅读语文名篇')" class="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-sm hover:bg-white transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-500">
+                                <i data-lucide="book-open" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">语文名文阅读</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">专家推荐</span>
+                                    <span class="text-[10px] text-gray-400">引导学生去阅读</span>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </div>
+
+                    <div onclick="event.stopPropagation(); showMessage('科普：为什么足球是黑白相间的？')" class="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-sm hover:bg-white transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-500">
+                                <i data-lucide="help-circle" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">足球几何密码</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">体育科技</span>
+                                    <span class="text-[10px] text-gray-400">引导学生去学习</span>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </div>
+                `;
+            } else {
+                // Scenario A: Default Recommendations (Xiaoming)
+                container.innerHTML = `
+                    <div onclick="event.stopPropagation(); openPaymentModal()" class="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-sm hover:bg-white transition-colors relative overflow-hidden cursor-pointer">
+                        <!-- VIP Badge -->
+                        <div class="absolute top-0 right-0">
+                            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg shadow-sm flex items-center gap-0.5">
+                                <i data-lucide="crown" class="w-2.5 h-2.5"></i> VIP
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-500">
+                                <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">高频错题强化</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">专家推荐</span>
+                                    <span class="text-[10px] text-gray-400">引导家长查看下载打印</span>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="lock" class="w-4 h-4 text-orange-400 mr-1"></i>
+                    </div>
+
+                    <div onclick="event.stopPropagation(); showMessage('播放英语听力精选内容')" class="bg-white/95 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-sm hover:bg-white transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-500">
+                                <i data-lucide="headphones" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800">练习英语听力</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">精选内容</span>
+                                    <span class="text-[10px] text-gray-400">引导家长去放给学生听</span>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </div>
+                `;
+            }
         }
 
         function switchStudent(name) {
             document.getElementById('current-student-name').textContent = name;
+            
+            // UI Elements
+            const checkMing = document.getElementById('check-mark-ming');
+            const checkHong = document.getElementById('check-mark-hong');
+            const checkGang = document.getElementById('check-mark-gang');
+            
+            const cardMing = document.getElementById('student-card-ming');
+            const cardHong = document.getElementById('student-card-hong');
+            const cardGang = document.getElementById('student-card-gang');
+
+            // Reset all styles
+            const inactiveClass = 'border border-gray-100 bg-white hover:bg-gray-50';
+            const activeClass = 'border-2 border-cyan-400 bg-cyan-50';
+            
+            // Helper to reset card
+            const resetCard = (card, check) => {
+                if(card) {
+                    card.className = `${inactiveClass} rounded-2xl p-3 flex items-center justify-between cursor-pointer transition-colors`;
+                }
+                if(check) check.classList.add('hidden');
+            };
+
+            resetCard(cardMing, checkMing);
+            resetCard(cardHong, checkHong);
+            resetCard(cardGang, checkGang);
+
+            // Set active card
+            const setActive = (card, check) => {
+                if(card) {
+                    card.className = `${activeClass} rounded-2xl p-3 flex items-center justify-between cursor-pointer transition-colors`;
+                }
+                if(check) check.classList.remove('hidden');
+            };
+
+            // UI Elements for School Info & Homework
+            const infoHasClass = document.getElementById('info-has-class');
+            const infoNoClass = document.getElementById('info-no-class');
+            const schoolText = document.getElementById('school-text');
+            const homeworkList = document.getElementById('homework-list');
+            const noTask = document.getElementById('no-task-today');
+
+            updateAIRecommendations(name);
+
+            if (name === '张小明') {
+                setActive(cardMing, checkMing);
+                
+                userState.errorCount = 12;
+                userState.hasWeeklyReport = true;
+                schoolText.textContent = "上海万瑞隆小学 · 六年级2班";
+                
+                infoHasClass.classList.remove('hidden');
+                infoNoClass.classList.add('hidden');
+                if(homeworkList) homeworkList.classList.remove('hidden');
+                if(noTask) noTask.classList.add('hidden');
+                
+                showMessage(`已切换到学生：${name}\n\n(模拟状态：数据丰富)`);
+
+            } else if (name === '张小红') {
+                setActive(cardHong, checkHong);
+                
+                userState.errorCount = 0;
+                userState.hasWeeklyReport = false;
+                
+                infoHasClass.classList.add('hidden');
+                infoNoClass.classList.remove('hidden');
+                if(homeworkList) homeworkList.classList.add('hidden');
+                if(noTask) {
+                    noTask.classList.remove('hidden');
+                    noTask.querySelector('h3').textContent = '暂无近期作业数据';
+                    noTask.querySelector('p').textContent = '当前暂未收到学校发布的作业任务';
+                }
+                
+                showMessage(`已切换到学生：${name}\n\n(模拟状态：无错题、无周报、未分班、无作业数据)`);
+
+            } else if (name === '王小刚') {
+                setActive(cardGang, checkGang);
+                
+                userState.errorCount = 0;
+                userState.hasWeeklyReport = false;
+                schoolText.textContent = "暂无学校信息";
+
+                infoHasClass.classList.remove('hidden');
+                infoNoClass.classList.add('hidden');
+
+                if(homeworkList) homeworkList.classList.add('hidden');
+                if(noTask) {
+                    noTask.classList.remove('hidden');
+                    noTask.querySelector('h3').textContent = '暂无近期作业数据';
+                    noTask.querySelector('p').textContent = '当前暂未收到学校发布的作业任务';
+                }
+
+                showMessage(`已切换到学生：${name}`);
+            }
+
+            // Update UI
+            updateErrorBookUI();
+            updateReportUI();
+            lucide.createIcons();
             closeSwitchChildModal();
-            showMessage(`已切换到学生：${name}`);
         }
 
         // 年级切换模态框逻辑
@@ -566,7 +1017,218 @@
             // Close Modal
             setTimeout(closeGradeModal, 200);
         }
+
+        // 支付弹窗逻辑
+        function openPaymentModal() {
+            const modal = document.getElementById('payment-modal');
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            // Hide parent navigation
+            if (window.parent) {
+                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: false }, '*');
+            }
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+            // Show parent navigation
+            if (window.parent) {
+                window.parent.postMessage({ type: 'TOGGLE_NAV', visible: true }, '*');
+            }
+        }
+
+        function selectPaymentOption(element) {
+            // Reset all options visual state
+            const container = element.parentElement;
+            const allOptions = container.children;
+            
+            for (let opt of allOptions) {
+                // Remove active classes
+                opt.classList.remove('border-orange-500', 'bg-orange-50/30');
+                
+                // Add default classes
+                if(opt.innerHTML.includes('连续包年')) {
+                    // Keep gradient for annual
+                     opt.classList.add('border-transparent');
+                } else {
+                     opt.classList.add('border-transparent', 'bg-white');
+                }
+
+                // Reset Check Circle
+                const check = opt.querySelector('.check-circle');
+                if(check) {
+                    check.classList.remove('opacity-100');
+                    check.classList.add('opacity-0');
+                }
+                
+                // Reset Ring
+                const ring = opt.querySelector('.w-5.h-5');
+                if(ring) {
+                    ring.classList.remove('border-orange-500');
+                    ring.classList.add('border-gray-200');
+                }
+            }
+
+            // Activate selected
+            element.classList.remove('border-transparent', 'bg-white');
+            element.classList.add('border-orange-500', 'bg-orange-50/30');
+            
+            // Activate Check Circle
+            const check = element.querySelector('.check-circle');
+            if(check) {
+                check.classList.remove('opacity-0');
+                check.classList.add('opacity-100');
+            }
+
+            // Activate Ring
+            const ring = element.querySelector('.w-5.h-5');
+            if(ring) {
+                ring.classList.remove('border-gray-200');
+                ring.classList.add('border-orange-500');
+            }
+        }
     </script>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="fixed inset-0 z-[60] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closePaymentModal()"></div>
+
+        <!-- Modal Panel -->
+        <div class="fixed inset-x-0 bottom-0 z-10 w-full overflow-hidden bg-white rounded-t-3xl shadow-2xl sm:inset-0 sm:flex sm:items-center sm:justify-center sm:bg-transparent sm:p-4 sm:rounded-none">
+            <div class="relative w-full max-w-md mx-auto bg-white sm:rounded-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+                
+                <!-- Header with Gradient -->
+                <div class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 text-white overflow-hidden shrink-0">
+                    <div class="absolute top-4 right-4 z-20">
+                         <button type="button" class="text-gray-400 hover:text-white transition-colors bg-white/10 rounded-full p-1" onclick="closePaymentModal()">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="relative z-10 mt-2">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
+                                <i data-lucide="crown" class="w-3 h-3"></i> VIP 专属权益
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-1">解锁高频错题强化</h3>
+                        <p class="text-gray-400 text-xs">获取专家推荐错题解析，快速提升成绩</p>
+                    </div>
+                    
+                    <!-- Decorative Circles -->
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-orange-500/10 rounded-full blur-xl"></div>
+                </div>
+
+                <!-- Content Scrollable -->
+                <div class="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar">
+                    
+                    <!-- Single Purchase Option -->
+                    <div class="border border-gray-100 rounded-xl p-4 flex items-center justify-between relative overflow-hidden group hover:border-orange-200 transition-all cursor-pointer bg-gray-50/50 hover:bg-orange-50/30">
+                         <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-600">
+                                 <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">解锁本套试卷</h4>
+                                <p class="text-[11px] text-gray-500">仅查看当前试卷错题解析</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-lg font-bold text-orange-600">¥ 3.9</span>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Options Title -->
+                    <div class="flex items-center gap-2 pt-2 pb-1">
+                        <div class="h-4 w-1 bg-orange-500 rounded-full"></div>
+                        <h4 class="font-bold text-gray-900 text-sm">开通会员畅享无限查看</h4>
+                    </div>
+
+                    <!-- Cards Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+                        
+                        <!-- Monthly -->
+                        <div class="border-2 border-transparent bg-white rounded-xl p-4 shadow-sm relative overflow-hidden cursor-pointer transition-all hover:shadow-md group" onclick="selectPaymentOption(this)">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h5 class="font-bold text-gray-800">连续包月</h5>
+                                        <span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">灵活订阅</span>
+                                    </div>
+                                    <div class="mt-2 flex items-baseline gap-1">
+                                        <span class="text-2xl font-bold text-orange-600">¥19</span>
+                                        <span class="text-xs text-gray-400 line-through">¥30</span>
+                                    </div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center group-hover:border-orange-300 transition-colors">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 opacity-0 transition-opacity check-circle"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quarterly -->
+                        <div class="border-2 border-orange-500 bg-orange-50/30 rounded-xl p-4 shadow-sm relative overflow-hidden cursor-pointer transition-all hover:shadow-md" onclick="selectPaymentOption(this)">
+                             <div class="absolute top-0 right-0 bg-gradient-to-bl from-orange-500 to-red-500 text-white text-[10px] px-2 py-1 rounded-bl-lg font-bold shadow-sm z-10">
+                                限时 6 折
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h5 class="font-bold text-gray-800">连续包季</h5>
+                                    </div>
+                                    <div class="mt-2 flex items-baseline gap-1">
+                                        <span class="text-2xl font-bold text-orange-600">¥45</span>
+                                        <span class="text-xs text-gray-400 line-through">¥75</span>
+                                        <span class="text-[10px] text-orange-600 bg-orange-100 px-1 rounded ml-1">¥15/月</span>
+                                    </div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-orange-500 flex items-center justify-center">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 opacity-100 transition-opacity check-circle"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Annual -->
+                        <div class="border-2 border-transparent bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 shadow-sm relative overflow-hidden cursor-pointer transition-all hover:shadow-md group" onclick="selectPaymentOption(this)">
+                            <div class="absolute top-0 left-0 bg-yellow-500 text-white text-[9px] px-1.5 py-0.5 rounded-br-lg font-bold z-10">
+                                推荐
+                            </div>
+                             <div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-2 py-1 rounded-bl-lg font-bold shadow-sm z-10">
+                                立省 ¥200
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h5 class="font-bold text-gray-800">连续包年</h5>
+                                    </div>
+                                    <div class="mt-2 flex items-baseline gap-1">
+                                        <span class="text-2xl font-bold text-orange-600">¥168</span>
+                                        <span class="text-xs text-gray-400 line-through">¥368</span>
+                                         <span class="text-[10px] text-orange-600 bg-orange-100 px-1 rounded ml-1">¥14/月</span>
+                                    </div>
+                                </div>
+                                 <div class="w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center group-hover:border-orange-300 transition-colors">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 opacity-0 transition-opacity check-circle"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[10px] text-gray-400 text-center pt-2">
+                        确认支付即代表同意 <a href="#" class="text-blue-500">《会员服务协议》</a> 和 <a href="#" class="text-blue-500">《自动续费协议》</a>
+                    </p>
+                </div>
+
+                <!-- Footer Action -->
+                <div class="p-4 border-t border-gray-100 bg-white shrink-0 safe-area-bottom">
+                    <button class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2" onclick="closePaymentModal()">
+                        立即开通 <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
