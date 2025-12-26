@@ -162,70 +162,110 @@
         <div onclick="toggleFilterModal()" class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"></div>
         
         <!-- 弹窗内容 (从底部滑出) -->
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] p-6 pb-10 transform transition-transform duration-300 translate-y-full" id="filter-panel">
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] p-6 pb-6 transform transition-transform duration-300 translate-y-full flex flex-col max-h-[85vh]" id="filter-panel">
             <!-- 顶部装饰条 -->
-            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 shrink-0"></div>
             
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-lg font-black text-gray-800">筛选练习记录</h2>
+            <div class="flex justify-between items-center mb-6 shrink-0">
+                <h2 class="text-lg font-black text-gray-800">筛选记录</h2>
                 <button onclick="toggleFilterModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 active:scale-90 transition-transform">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <div class="space-y-8 overflow-y-auto max-h-[60vh] px-2 no-scrollbar">
+            <div class="space-y-6 overflow-y-auto px-2 no-scrollbar flex-1 pb-4">
                 <!-- 1. 年级 -->
                 <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-1 h-4 bg-cyan-500 rounded-full"></div>
-                        <h3 class="font-bold text-gray-800 text-sm">年级</h3>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-1 h-3.5 bg-cyan-500 rounded-full"></div>
+                        <h3 class="font-bold text-gray-800 text-[13px]">年级</h3>
                     </div>
-                    <div class="grid grid-cols-4 gap-3" id="filter-grade">
-                        <button onclick="selectFilter('grade', '全部')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="全部">全部</button>
-                        <button onclick="selectFilter('grade', '一年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="一年级">一年级</button>
-                        <button onclick="selectFilter('grade', '二年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="二年级">二年级</button>
-                        <button onclick="selectFilter('grade', '三年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="三年级">三年级</button>
-                        <button onclick="selectFilter('grade', '四年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="四年级">四年级</button>
-                        <button onclick="selectFilter('grade', '五年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="五年级">五年级</button>
-                        <button onclick="selectFilter('grade', '六年级')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="六年级">六年级</button>
-                        <button onclick="selectFilter('grade', '初中')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="初中">初中</button>
+                    <div class="grid grid-cols-4 gap-2.5" id="filter-grade">
+                        <button onclick="selectFilter('grade', '全部')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="全部">全部</button>
+                        <button onclick="selectFilter('grade', '一年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="一年级">一年级</button>
+                        <button onclick="selectFilter('grade', '二年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="二年级">二年级</button>
+                        <button onclick="selectFilter('grade', '三年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="三年级">三年级</button>
+                        <button onclick="selectFilter('grade', '四年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="四年级">四年级</button>
+                        <button onclick="selectFilter('grade', '五年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="五年级">五年级</button>
+                        <button onclick="selectFilter('grade', '六年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="六年级">六年级</button>
+                        <button onclick="selectFilter('grade', '七年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="七年级">七年级</button>
+                        <button onclick="selectFilter('grade', '八年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="八年级">八年级</button>
+                        <button onclick="selectFilter('grade', '九年级')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="九年级">九年级</button>
+                        <button onclick="selectFilter('grade', '高一')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="七年级">高一</button>
+                        <button onclick="selectFilter('grade', '高二')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="高二">高二</button>
+                        <button onclick="selectFilter('grade', '高三')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="高三">高三</button>
                     </div>
                 </div>
 
                 <!-- 2. 完成状态 -->
                 <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-1 h-4 bg-cyan-500 rounded-full"></div>
-                        <h3 class="font-bold text-gray-800 text-sm">完成状态</h3>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-1 h-3.5 bg-cyan-500 rounded-full"></div>
+                        <h3 class="font-bold text-gray-800 text-[13px]">完成状态</h3>
                     </div>
-                    <div class="grid grid-cols-4 gap-3" id="filter-status">
-                        <button onclick="selectFilter('status', '全部')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="全部">全部</button>
-                        <button onclick="selectFilter('status', 'unsubmitted')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="unsubmitted">未开始</button>
-                        <button onclick="selectFilter('status', 'grading')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="grading">进行中</button>
-                        <button onclick="selectFilter('status', 'graded')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="graded">已完成</button>
+                    <div class="grid grid-cols-4 gap-2.5" id="filter-status">
+                        <button onclick="selectFilter('status', '全部')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="全部">全部</button>
+                        <button onclick="selectFilter('status', 'unsubmitted')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="unsubmitted">未开始</button>
+                        <button onclick="selectFilter('status', 'grading')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="grading">进行中</button>
+                        <button onclick="selectFilter('status', 'graded')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="graded">已完成</button>
                     </div>
                 </div>
 
                 <!-- 3. 时间范围 -->
                 <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-1 h-4 bg-cyan-500 rounded-full"></div>
-                        <h3 class="font-bold text-gray-800 text-sm">时间范围</h3>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-1 h-3.5 bg-cyan-500 rounded-full"></div>
+                        <h3 class="font-bold text-gray-800 text-[13px]">时间范围</h3>
                     </div>
-                    <div class="grid grid-cols-4 gap-3" id="filter-time">
-                        <button onclick="selectFilter('time', '全部')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="全部">全部</button>
-                        <button onclick="selectFilter('time', '本周')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="本周">本周</button>
-                        <button onclick="selectFilter('time', '本月')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="本月">本月</button>
-                        <button onclick="selectFilter('time', '近3个月')" class="filter-btn py-2 rounded-xl text-xs font-bold transition-all border" data-value="近3个月">近3个月</button>
+                    <div class="grid grid-cols-4 gap-2.5" id="filter-time">
+                        <button onclick="selectFilter('time', '全部')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="全部">全部</button>
+                        <button onclick="selectFilter('time', '本周')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="本周">本周</button>
+                        <button onclick="selectFilter('time', '本月')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="本月">本月</button>
+                        <button onclick="selectFilter('time', '近3个月')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="近3个月">近3个月</button>
+                        <button onclick="selectFilter('time', '本学期')" class="filter-btn py-2 rounded-xl text-[11px] font-bold transition-all border" data-value="本学期">本学期</button>
                     </div>
                 </div>
             </div>
 
             <!-- 底部按钮 -->
-            <div class="flex gap-4 mt-10">
-                <button onclick="resetFilters()" class="flex-1 py-3.5 bg-rose-50 text-rose-500 rounded-2xl font-bold text-sm active:scale-95 transition-all">重置</button>
-                <button onclick="applyFilters()" class="flex-[2.5] bg-gradient-to-r from-cyan-400 to-cyan-500 text-white py-3.5 rounded-2xl font-black text-sm shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-95 transition-all">
+            <div class="flex gap-3 mt-4 shrink-0">
+                <button onclick="resetFilters()" class="flex-1 py-3 bg-rose-50 text-rose-500 rounded-2xl font-bold text-sm active:scale-95 transition-all">重置</button>
+                <button onclick="applyFilters()" class="flex-[2.5] bg-gradient-to-r from-cyan-400 to-cyan-500 text-white py-3 rounded-2xl font-black text-sm shadow-[0_8px_20px_-6px_rgba(9,192,215,0.4)] active:scale-95 transition-all">
                     确认筛选 <span id="filter-count-label" class="opacity-70"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 作业操作选择弹窗 (校本作业未开始状态) -->
+    <div id="school-action-modal" class="fixed inset-0 z-[110] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeSchoolActionModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] p-6 pb-12 shadow-2xl transform translate-y-full transition-transform duration-300 z-[120]" id="school-action-panel">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex flex-col">
+                    <h3 class="text-xl font-black text-gray-900 tracking-tight">请选择错题收集方式</h3>
+                    <p class="text-[12px] text-gray-400 font-bold mt-1">您可以拍照批改整页作业，或手动标记错题</p>
+                </div>
+                <button onclick="closeSchoolActionModal()" class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <button class="flex flex-col items-center justify-center p-6 bg-[#F0F9FF] border-2 border-transparent hover:border-blue-400 rounded-3xl transition-all group active:scale-[0.98]">
+                    <div class="w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                        <i data-lucide="camera" class="w-8 h-8"></i>
+                    </div>
+                    <span class="text-[15px] font-black text-blue-600">拍照批改</span>
+                    <span class="text-[10px] text-blue-400 font-bold mt-1">上传作业图片</span>
+                </button>
+
+                <button class="flex flex-col items-center justify-center p-6 bg-[#FFF1F2] border-2 border-transparent hover:border-rose-400 rounded-3xl transition-all group active:scale-[0.98]">
+                    <div class="w-16 h-16 bg-rose-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/30 group-hover:scale-110 transition-transform">
+                        <i data-lucide="check-square" class="w-8 h-8"></i>
+                    </div>
+                    <span class="text-[15px] font-black text-rose-600">标记错题</span>
+                    <span class="text-[10px] text-rose-400 font-bold mt-1">手动录入错题</span>
                 </button>
             </div>
         </div>
@@ -399,6 +439,17 @@
                 source: '错题本组卷'
             },
             {
+                id: 'c1_math',
+                type: 'consolidation',
+                subject: '数学',
+                title: '几何图形周长面积综合练习',
+                status: 'generated',
+                date: '2023-10-25',
+                count: 12,
+                tags: ['包含变式题'],
+                source: '错题本组卷'
+            },
+            {
                 id: 'c2',
                 type: 'consolidation',
                 subject: '语文',
@@ -452,7 +503,7 @@
                 subject: '数学',
                 title: '每日一练：应用题专项',
                 status: 'graded', // 已批阅
-                score: '92',
+                score: '92%',
                 date: '2023-10-26',
                 count: 10,
                 tags: ['错题:2 待消灭'],
@@ -508,7 +559,8 @@
                 status: 'generated',
                 date: '2023-10-27',
                 count: 8,
-                tags: ['专家推荐'],
+                tags: ['专家推荐', '专项练习'],
+                difficulty: 4,
                 source: 'expert',
                 isVip: true
             },
@@ -520,7 +572,8 @@
                 status: 'generated',
                 date: '2023-10-26',
                 count: 3,
-                tags: ['教师推荐'],
+                tags: ['教师推荐', '阅读专项'],
+                difficulty: 3,
                 source: 'teacher',
                 isVip: false
             }
@@ -673,6 +726,19 @@
                         <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-100 to-transparent opacity-40"></div>
                     `;
                 } else {
+                    // 非生成中状态的校本作业增加跳转
+                    if (item.type === 'school') {
+                        card.classList.add('cursor-pointer');
+                        card.onclick = (e) => {
+                            // 如果点击的是按钮，不触发卡片跳转
+                            if (e.target.closest('button')) return;
+                            
+                            if (item.status === 'unsubmitted') goToHomeworkDetail('uncollected');
+                            else if (item.status === 'grading') goToHomeworkDetail('grading');
+                            else if (item.status === 'graded') goToHomeworkDetail('graded');
+                        };
+                    }
+
                     // Icons and Colors
                     let icon = 'file-text';
                     let iconBg = 'bg-[#E0F7FA] text-[#00ACC1]';
@@ -688,12 +754,41 @@
                     }
 
                     // Header Tags
-                    const tagHtml = (item.tags || []).map(tag => {
+                    const topRightTags = [];
+                    const displayTags = (item.tags || []).filter(tag => {
+                        if (tag === '包含变式题' || tag === '专家推荐' || tag === '教师推荐') {
+                            topRightTags.push(tag);
+                            return false;
+                        }
+                        // 过滤掉已经在 infoBar 中展示的“共X题”标签
+                        if (/^共\d+题$/.test(tag)) return false;
+                        return true;
+                    });
+
+                    const tagHtml = displayTags.map(tag => {
                         let tagClass = 'bg-[#F1F5F9] text-[#64748B]';
                         if (tag.includes('专项') || tag.includes('错题')) tagClass = 'bg-[#FFF1F2] text-[#E11D48] border border-[#FFE4E6]';
                         if (tag.includes('工整')) tagClass = 'bg-[#ECFDF5] text-[#059669] border border-[#D1FAE5]';
                         if (tag.includes('同步')) tagClass = 'bg-[#EFF6FF] text-[#2563EB] border border-[#DBEAFE]';
                         return `<span class="${tagClass} text-[10px] px-2.5 py-0.5 rounded-full font-bold tracking-tight">${tag}</span>`;
+                    }).join('');
+
+                    // Difficulty Stars
+                    let difficultyHtml = '';
+                    if (item.type === 'push' && item.difficulty) {
+                        difficultyHtml = `
+                            <div class="flex items-center gap-0.5 ml-1">
+                                ${Array.from({ length: 5 }).map((_, i) => `
+                                    <i data-lucide="star" class="w-3 h-3 ${i < item.difficulty ? 'text-orange-400 fill-orange-400' : 'text-gray-200'}"></i>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    const topRightTagHtml = topRightTags.map(tag => {
+                        let tagClass = 'bg-orange-50 text-orange-600 border border-orange-100';
+                        if (tag === '包含变式题') tagClass = 'bg-cyan-50 text-cyan-600 border border-cyan-100';
+                        return `<span class="${tagClass} text-[10px] px-2 py-0.5 rounded-bl-xl rounded-tr-none font-black absolute top-0 right-0">${tag}</span>`;
                     }).join('');
 
                     // Score Display
@@ -709,36 +804,66 @@
                         </div>
                     ` : '';
 
+                    // Info Bar (Generation time and count)
+                    let infoBar = '';
+                    let timeLabel = '生成时间';
+                    if (item.type === 'school') timeLabel = '作业时间';
+                    if (item.type === 'essay') timeLabel = '作业时间';
+
+                    if (item.status !== 'generating') {
+                        const countHtml = item.type !== 'essay' ? `
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="list-checks" class="w-3.5 h-3.5 opacity-60"></i>
+                                    共 ${item.count} 题
+                                </div>
+                        ` : '';
+
+                        infoBar = `
+                            <div class="flex items-center gap-4 mb-4 text-[11px] text-gray-400 font-medium">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="calendar" class="w-3.5 h-3.5 opacity-60"></i>
+                                    ${timeLabel}：${item.date}
+                                </div>
+                                ${countHtml}
+                            </div>
+                        `;
+                    }
+
                     // Status Bar Logic
                     let statusBar = '';
                     if (item.statusMsg) {
-                        let barClass = 'bg-[#F8FAFC] text-[#64748B] border border-[#F1F5F9]';
-                        let badgeClass = 'text-[#E11D48] bg-[#FFF1F2] border border-[#FFE4E6]';
-                        let badgeText = '未开始';
-                        let iconHtml = '<i data-lucide="circle-dashed" class="w-3.5 h-3.5"></i>';
+                        // 已完成状态的校本作业和习作不展示中间的状态栏
+                        const isGradedSchoolOrEssay = (item.type === 'school' || item.type === 'essay') && item.status === 'graded';
+                        
+                        if (!isGradedSchoolOrEssay) {
+                            let barClass = 'bg-[#F8FAFC] text-[#64748B] border border-[#F1F5F9]';
+                            let badgeClass = 'text-[#E11D48] bg-[#FFF1F2] border border-[#FFE4E6]';
+                            let badgeText = '未开始';
+                            let iconHtml = '<i data-lucide="circle-dashed" class="w-3.5 h-3.5"></i>';
 
-                        if (item.status === 'grading') {
-                            barClass = 'bg-[#F0F9FF] text-[#0284C7] border border-[#E0F2FE]';
-                            badgeClass = 'text-blue-500 bg-blue-50 border border-blue-200';
-                            badgeText = '进行中';
-                            iconHtml = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i>';
-                        } else if (item.status === 'graded') {
-                            barClass = 'bg-emerald-50/50 text-emerald-600 border border-emerald-100/50';
-                            badgeClass = 'text-emerald-600 bg-emerald-50 border border-emerald-200';
-                            badgeText = '已完成';
-                            iconHtml = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>';
+                            if (item.status === 'grading') {
+                                barClass = 'bg-[#F0F9FF] text-[#0284C7] border border-[#E0F2FE]';
+                                badgeClass = 'text-blue-500 bg-blue-50 border border-blue-200';
+                                badgeText = '进行中';
+                                iconHtml = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i>';
+                            } else if (item.status === 'graded') {
+                                barClass = 'bg-emerald-50/50 text-emerald-600 border border-emerald-100/50';
+                                badgeClass = 'text-emerald-600 bg-emerald-50 border border-emerald-200';
+                                badgeText = '已完成';
+                                iconHtml = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>';
+                            }
+
+                            statusBar = `
+                                <div class="${barClass} rounded-2xl p-3.5 flex justify-between items-center mb-5 backdrop-blur-sm">
+                                    <div class="text-[12px] flex items-center gap-2.5 font-bold">
+                                        ${iconHtml} ${item.statusMsg}
+                                    </div>
+                                    <div class="${badgeClass} px-2.5 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase">
+                                        ${badgeText}
+                                    </div>
+                                </div>
+                            `;
                         }
-
-                        statusBar = `
-                            <div class="${barClass} rounded-2xl p-3.5 flex justify-between items-center mb-5 backdrop-blur-sm">
-                                <div class="text-[12px] flex items-center gap-2.5 font-bold">
-                                    ${iconHtml} ${item.statusMsg}
-                                </div>
-                                <div class="${badgeClass} px-2.5 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase">
-                                    ${badgeText}
-                                </div>
-                            </div>
-                        `;
                     }
 
                     // Action Buttons Logic
@@ -765,23 +890,23 @@
                     } else if (item.type === 'school') {
                         if (item.status === 'unsubmitted') {
                             actionHtml = `
-                                <button class="w-full py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                <button onclick="openSchoolActionModal()" class="w-full py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
                                     <i data-lucide="pencil-line" class="w-4.5 h-4.5"></i> 拍照批改/标记错题
                                 </button>
                             `;
                         } else if (item.status === 'grading') {
                             actionHtml = `
-                                <button class="w-full py-3.5 bg-white border border-[#09C0D7]/30 text-[#09C0D7] rounded-2xl text-[13px] font-black active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 shadow-sm">
+                                <button onclick="goToHomeworkDetail('grading')" class="w-full py-3.5 bg-white border border-[#09C0D7]/30 text-[#09C0D7] rounded-2xl text-[13px] font-black active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 shadow-sm">
                                     <i data-lucide="glasses" class="w-4.5 h-4.5"></i> 查看详情
                                 </button>
                             `;
                         } else {
                             actionHtml = `
                                 <div class="flex gap-3">
-                                    <button class="flex-[0.4] py-3.5 border border-gray-100 text-gray-500 hover:bg-gray-50 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                    <button onclick="goToHomeworkDetail('graded')" class="flex-[0.4] py-3.5 border border-gray-100 text-gray-500 hover:bg-gray-50 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                                         <i data-lucide="history" class="w-4 h-4"></i> 错题巩固
                                     </button>
-                                    <button class="flex-1 py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
+                                    <button onclick="goToHomeworkDetail('graded')" class="flex-1 py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5">
                                         <i data-lucide="check-square" class="w-4.5 h-4.5"></i> 查看评价
                                     </button>
                                 </div>
@@ -796,33 +921,39 @@
                     } else {
                         // Consolidation & Push
                         actionHtml = `
-                            <div class="flex gap-3">
-                                <button onclick="previewPdf('${item.title.replace(/'/g, "\\'")}')" class="flex-1 py-3.5 border border-gray-100 text-gray-600 hover:bg-gray-50 rounded-2xl text-[13px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                    <i data-lucide="eye" class="w-4 h-4"></i> 在线预览
+                            <div class="flex gap-2">
+                                <button onclick="previewPdf('${item.title.replace(/'/g, "\\'")}')" class="flex-1 py-2.5 border border-gray-100 text-gray-600 hover:bg-gray-50 rounded-xl text-[12px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> 预览下载
                                 </button>
-                                <button class="flex-1 py-3.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-2xl text-[13px] font-black shadow-[0_8px_24px_-6px_rgba(9,192,215,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                    <i data-lucide="download-cloud" class="w-4.5 h-4.5"></i> 下载PDF
+                                <button class="flex-1 py-2.5 border border-gray-100 text-gray-600 hover:bg-gray-50 rounded-xl text-[12px] font-bold active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
+                                    <i data-lucide="camera" class="w-3.5 h-3.5"></i> 拍照批改
+                                </button>
+                                <button class="flex-1 py-2.5 bg-[#09C0D7] hover:bg-[#08aebd] text-white rounded-xl text-[12px] font-black shadow-[0_4px_12px_-3px_rgba(9,192,215,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
+                                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i> 在线作答
                                 </button>
                             </div>
                         `;
                     }
 
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-6">
+                        ${topRightTagHtml}
+                        <div class="flex justify-between items-start mb-4">
                             <div class="flex items-start gap-4 flex-1">
                                 <div class="w-13 h-13 rounded-[1.25rem] ${iconBg} flex items-center justify-center flex-shrink-0 shadow-sm border border-white/20">
                                     <i data-lucide="${icon}" class="w-6.5 h-6.5"></i>
                                 </div>
                                 <div class="flex-1 min-w-0 pr-2">
-                                    <h3 class="font-black text-gray-900 text-[16px] mb-2.5 line-clamp-2 leading-[1.3] tracking-tight">${item.title}</h3>
+                                    <h3 class="font-black text-gray-900 text-[16px] mb-2 line-clamp-2 leading-[1.3] tracking-tight">${item.title}</h3>
                                     <div class="flex flex-wrap items-center gap-2">
                                         ${tagHtml}
+                                        ${difficultyHtml}
                                     </div>
                                 </div>
                             </div>
                             ${scoreHtml}
                         </div>
                         
+                        ${infoBar}
                         ${statusBar}
                         <div class="mt-auto">
                             ${actionHtml}
@@ -862,6 +993,45 @@
         function closePaymentModal() {
             document.getElementById('payment-modal').classList.add('hidden');
             // 通知父页面弹窗已关闭，恢复 iframe 层级
+            if (window.parent) {
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
+            }
+        }
+
+        // 校本作业跳转逻辑
+        function goToHomeworkDetail(state) {
+            window.location.href = `jsx_homework_dedtail.html?state=${state}`;
+        }
+
+        // 校本作业操作弹窗逻辑
+        function openSchoolActionModal() {
+            const modal = document.getElementById('school-action-modal');
+            const panel = document.getElementById('school-action-panel');
+            
+            modal.classList.remove('hidden');
+            // Force layout for transition
+            setTimeout(() => {
+                panel.classList.remove('translate-y-full');
+                panel.classList.add('translate-y-0');
+            }, 10);
+            
+            if (window.parent) {
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
+            }
+            lucide.createIcons();
+        }
+
+        function closeSchoolActionModal() {
+            const modal = document.getElementById('school-action-modal');
+            const panel = document.getElementById('school-action-panel');
+            
+            panel.classList.add('translate-y-full');
+            panel.classList.remove('translate-y-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            
             if (window.parent) {
                 window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
             }
