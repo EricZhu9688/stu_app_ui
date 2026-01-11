@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>正版资源验证</title>
+    <style>
+        /* --- 基础样式 --- */
+        :root { --primary: #007AFF; --bg: #F0F2F5; --card-bg: #FFFFFF; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); color: #333; min-height: 100vh; padding-bottom: 40px; }
+
+        /* --- 顶部图书信息 --- */
+        .book-header { background: #fff; padding: 16px 20px; display: flex; align-items: center; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
+        .book-cover-thumb { width: 36px; height: 50px; background: #ddd; border-radius: 4px; margin-right: 12px; flex-shrink: 0; object-fit: cover; }
+        .book-info h1 { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 2px; }
+        .book-info p { font-size: 12px; color: #999; }
+
+        /* --- 核心资源卡片 (上部) --- */
+        .resource-section { padding: 20px 16px 0; }
+        .res-card { 
+            background: #fff; border-radius: 16px; overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04); text-align: center; padding-bottom: 20px;
+        }
+        
+        /* 模糊预览区 */
+        .blur-preview {
+            height: 140px; background: #eee; position: relative;
+            background-image: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');
+            background-size: cover;
+        }
+        /* 锁图标覆盖 */
+        .lock-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
+        }
+        .lock-circle { width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .res-title { font-size: 16px; font-weight: bold; margin: 16px 16px 8px; }
+        .res-tag { display: inline-block; font-size: 12px; color: #ff9500; background: #fff8e6; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+
+        /* --- 引导激活区 (下部 - 重点修改) --- */
+        .guide-section { padding: 20px 16px; }
+        
+        /* 流程图示 */
+        .flow-box {
+            background: #fff; border-radius: 12px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .flow-title { font-size: 14px; font-weight: bold; margin-bottom: 16px; color: #111; display: flex; align-items: center; }
+        .flow-title::before { content:''; width: 3px; height: 14px; background: var(--primary); margin-right: 8px; border-radius: 2px; }
+
+        /* 两个状态的对比 */
+        .status-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .status-item { width: 48%; background: #F7F8FA; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
+        .status-item.active { border-color: var(--primary); background: #F0F7FF; }
+        
+        .status-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+        .status-text { font-size: 13px; font-weight: 600; color: #333; display: block; margin-bottom: 2px; }
+        .status-desc { font-size: 11px; color: #999; line-height: 1.3; }
+
+        /* 激活卡示意图 */
+        .card-tip { 
+            display: flex; align-items: center; background: #FFFBE6; border: 1px solid #FFE58F; 
+            border-radius: 8px; padding: 10px; margin-top: 10px; 
+        }
+        .card-img { width: 40px; height: 28px; background: linear-gradient(135deg, #ddd 0%, #fff 50%, #ddd 100%); border-radius: 3px; border: 1px solid #ccc; margin-right: 10px; position: relative; flex-shrink: 0; }
+        .card-img::after { content: '密码'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 8px; color: #666; }
+        .card-text { font-size: 12px; color: #8a6d3b; line-height: 1.4; text-align: left; }
+
+        /* --- 底部按钮 --- */
+        .footer-action { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: #fff; padding: 12px 20px 30px; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100;
+        }
+        
+        .main-btn {
+            width: 100%; height: 48px; border-radius: 24px; border: none;
+            background: var(--primary); color: #fff; font-size: 16px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+        .btn-sub { font-size: 11px; font-weight: normal; margin-left: 6px; opacity: 0.8; }
+
+    </style>
+</head>
+<body>
+
+    <!-- 顶部：图书确认 -->
+    <div class="book-header">
+        <img src="https://via.placeholder.com/72x100" class="book-cover-thumb" alt="Book">
+        <div class="book-info">
+            <h1>小学语文 六年级下册 (2024版)</h1>
+            <p>包含 32 个视频 · 15 套试卷</p>
+        </div>
+    </div>
+
+    <!-- 资源锁定区 -->
+    <div class="resource-section">
+        <div class="res-card">
+            <div class="blur-preview">
+                <div class="lock-overlay">
+                    <div class="lock-circle">🔒</div>
+                    <div style="font-size: 12px; font-weight: 500;">正版用户专享</div>
+                </div>
+            </div>
+            <div class="res-title">第一单元：课文深度精讲视频</div>
+            <span class="res-tag">需要激活</span>
+        </div>
+    </div>
+
+    <!-- 引导激活区 -->
+    <div class="guide-section">
+        <div class="flow-box">
+            <div class="flow-title">系统将自动检测您的权益</div>
+            
+            <!-- 两种情况的说明 -->
+            <div class="status-row">
+                <!-- 情况1：未激活 -->
+                <div class="status-item active" onclick="selectStatus(this, 'unactivated')">
+                    <span class="status-icon">🆕</span>
+                    <span class="status-text">还没激活过？</span>
+                    <span class="status-desc">系统将引导您输入激活码</span>
+                </div>
+                <!-- 情况2：已激活 -->
+                <div class="status-item" onclick="selectStatus(this, 'activated')">
+                    <span class="status-icon">✅</span>
+                    <span class="status-text">已经激活了？</span>
+                    <span class="status-desc">系统将直接播放视频</span>
+                </div>
+            </div>
+
+            <!-- 动态提示文案 -->
+            <div id="tip-container">
+                <div class="card-tip">
+                    <div class="card-img"></div>
+                    <div class="card-text">
+                        <strong>请准备好激活卡：</strong><br>
+                        通常位于书本的 <span style="color:#d4380d; font-weight:bold;">封二或封三</span>，刮开涂层即可获取激活码。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="footer-action">
+        <!-- 
+            微信开放标签
+            注意：path 依然只需要传资源ID。
+            小程序端接收到 ID 后，先去查用户有没有这本书的权益。
+            如果没有 -> 跳转激活页。
+            如果有 -> 跳转视频页。
+        -->
+        <wx-open-launch-weapp id="launch-btn" username="gh_xxxx" path="pages/index/index?resId=1001">
+            <script type="text/wxtag-template">
+                <style>.btn { width: 100%; height: 48px; background: #007AFF; color: #fff; border-radius: 24px; border:none; font-size: 16px; font-weight: bold; }</style>
+                <button class="btn">前往验证并观看</button>
+            </script>
+        </wx-open-launch-weapp>
+
+        <!-- 模拟按钮 -->
+        <button class="main-btn" onclick="mockJump()">
+            前往验证并观看 <span class="btn-sub">(自动识别权益)</span>
+        </button>
+    </div>
+
+    <script>
+        // 简单的交互逻辑：点击不同状态切换提示语
+        function selectStatus(el, type) {
+            // 样式切换
+            document.querySelectorAll('.status-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+
+            // 内容切换
+            const container = document.getElementById('tip-container');
+            if (type === 'unactivated') {
+                container.innerHTML = `
+                    <div class="card-tip">
+                        <div class="card-img"></div>
+                        <div class="card-text">
+                            <strong>请准备好激活卡：</strong><br>
+                            通常位于书本的 <span style="color:#d4380d; font-weight:bold;">封二或封三</span>，刮开涂层即可获取激活码。
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="card-tip" style="background: #F6FFED; border-color: #B7EB8F;">
+                        <div style="font-size: 24px; margin-right: 12px;">🚀</div>
+                        <div class="card-text" style="color: #389e0d;">
+                            <strong>极速播放：</strong><br>
+                            点击下方按钮，将为您自动跳转至小程序播放页面。
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function mockJump() {
+            alert("模拟跳转小程序...\n\n小程序逻辑：\nif (已激活) { 播放视频 }\nelse { 跳转扫激活码页面 }");
+        }
+    </script>
+</body>
+</html>

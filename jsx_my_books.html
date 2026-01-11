@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的教辅</title>
+    <script src="js/tailwind.min.js"></script>
+    <script src="js/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .gradient-card {
+            background: linear-gradient(135deg, #4F6BE4 0%, #09C0D7 100%);
+        }
+        
+        /* Modal Animation */
+        .modal-enter {
+            animation: modalFadeIn 0.2s ease-out forwards;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-xl relative pb-20">
+        
+        <!-- 顶部导航 -->
+        <div class="flex items-center justify-between p-4 bg-white sticky top-0 z-10">
+            <button onclick="history.back()" class="p-2 -ml-2 text-gray-600 hover:bg-gray-50 rounded-full">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-lg font-bold text-gray-900">智能解析</h1>
+            <div class="w-8"></div> <!-- 占位 -->
+        </div>
+
+        <!-- 扫码学习入口卡片 -->
+        <div class="px-4 mb-8">
+            <div class="gradient-card rounded-2xl p-6 text-white shadow-lg shadow-blue-200/50 flex flex-col items-center justify-center gap-3 h-40 relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-transform" onclick="checkPermissionAndScan()">
+                <!-- 背景装饰 -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-xl -ml-10 -mb-10"></div>
+                
+                <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-sm mb-1">
+                    <i data-lucide="scan-line" class="w-8 h-8 text-white"></i>
+                </div>
+                <span class="text-lg font-bold tracking-wide">扫码学习</span>
+            </div>
+        </div>
+
+        <!-- 我的图书 -->
+        <div class="px-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-800">我的图书</h2>
+                <button onclick="window.location.href='jsx_activate_book.html'" class="px-3 py-1.5 bg-[#09C0D7]/10 text-[#09C0D7] rounded-full text-xs font-bold flex items-center gap-1 hover:bg-[#09C0D7]/20 transition-colors">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> 激活图书
+                </button>
+            </div>
+
+            <!-- 图书列表 -->
+            <div class="space-y-4" id="book-list">
+                <!-- Book Item 1 -->
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-20 h-28 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative shadow-inner">
+                        <img src="https://placehold.co/160x220/ffebd0/e67e22?text=Math" class="w-full h-full object-cover">
+                        <!-- 装饰书脊 -->
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-black/10"></div>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                            <h3 class="text-[15px] font-bold text-gray-800 leading-tight mb-2 line-clamp-2">小学数学 同步作业公式法 六年级 下册 2024版</h3>
+                            <p class="text-xs text-gray-500 mb-1">六年级 · 共6讲 · 共6个知识板块</p>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between items-center text-xs text-gray-400 mb-1.5">
+                                <span>学习进度</span>
+                                <span class="text-[#09C0D7] font-bold">5%</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#09C0D7] rounded-full" style="width: 5%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Item 2 -->
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-20 h-28 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative shadow-inner">
+                        <img src="https://placehold.co/160x220/e0f2f1/00796b?text=English" class="w-full h-full object-cover">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-black/10"></div>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                            <h3 class="text-[15px] font-bold text-gray-800 leading-tight mb-2 line-clamp-2">小学英语 核心词汇专项训练 五年级 上册</h3>
+                            <p class="text-xs text-gray-500 mb-1">五年级 · 共8讲 · 核心词汇300+</p>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between items-center text-xs text-gray-400 mb-1.5">
+                                <span>学习进度</span>
+                                <span class="text-[#09C0D7] font-bold">32%</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#09C0D7] rounded-full" style="width: 32%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 权限申请弹窗 (模拟) -->
+    <div id="permission-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="togglePermissionModal(false)"></div>
+        <div class="bg-white rounded-2xl p-6 w-[80%] max-w-sm relative z-10 modal-enter text-center shadow-2xl">
+            <h3 class="text-lg font-bold text-gray-900 mb-3">提示</h3>
+            <p class="text-sm text-gray-600 leading-relaxed mb-6">
+                请开启相机权限，用于纸制教辅扫码激活、扫码学习视频资料和拍照批改，设置个人头像
+            </p>
+            <div class="flex gap-3">
+                <button onclick="togglePermissionModal(false)" class="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-colors">取消</button>
+                <button onclick="grantPermission()" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#09C0D7] to-[#08B4CA] text-white font-bold text-sm shadow-md shadow-cyan-100 hover:opacity-90 transition-opacity">允许</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function checkPermissionAndScan() {
+            // 模拟首次点击需要权限
+            togglePermissionModal(true);
+        }
+
+        function togglePermissionModal(show) {
+            const modal = document.getElementById('permission-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function grantPermission() {
+            togglePermissionModal(false);
+            // 模拟跳转扫码
+            window.location.href = 'jsx_camera_scan.html';
+        }
+
+        // 模拟页面加载后检查权限（演示用，延迟1秒弹出）
+        // setTimeout(() => {
+        //     togglePermissionModal(true);
+        // }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>教辅激活助手</title>
+    <style>
+        /* --- 全局重置 --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, sans-serif; background-color: #F7F8FA; color: #333; line-height: 1.5; padding-bottom: 90px; }
+        
+        /* --- 顶部导航/品牌 --- */
+        .header { padding: 16px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666; font-weight: 500; }
+        .header img { width: 18px; height: 18px; margin-right: 6px; }
+
+        /* --- 核心图书卡片 --- */
+        .card { background: #fff; margin: 16px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .book-info { display: flex; align-items: flex-start; }
+        .book-cover { width: 80px; height: 110px; border-radius: 6px; object-fit: cover; background: #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .book-details { margin-left: 16px; flex: 1; }
+        .status-tag { display: inline-block; background: #E8FAF0; color: #00B365; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-bottom: 8px; font-weight: 600; }
+        .book-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; color: #1A1A1A; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .book-desc { font-size: 12px; color: #999; }
+
+        /* --- 视频教程区域 --- */
+        .section-title { font-size: 15px; font-weight: bold; margin: 24px 16px 12px; display: flex; align-items: center; }
+        .section-title::before { content: ''; width: 4px; height: 16px; background: #007AFF; border-radius: 2px; margin-right: 8px; }
+        
+        .video-wrapper { margin: 0 16px; border-radius: 8px; overflow: hidden; position: relative; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* 16:9 比例容器 */
+        .video-ratio { padding-bottom: 56.25%; position: relative; }
+        .video-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'); background-size: cover; }
+        .play-btn { width: 48px; height: 48px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .play-icon { width: 0; height: 0; border-style: solid; border-width: 8px 0 8px 14px; border-color: transparent transparent transparent #007AFF; margin-left: 4px; }
+        .video-text { color: #fff; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+        /* --- 步骤说明 --- */
+        .steps-container { margin: 16px 16px; background: #fff; padding: 20px; border-radius: 12px; }
+        .step-item { display: flex; margin-bottom: 20px; position: relative; }
+        .step-item:last-child { margin-bottom: 0; }
+        .step-item:not(:last-child)::after { content: ''; position: absolute; left: 11px; top: 24px; bottom: -16px; width: 1px; background: #E0E0E0; }
+        
+        .step-num { width: 22px; height: 22px; background: #EAF4FF; color: #007AFF; border-radius: 50%; text-align: center; line-height: 22px; font-size: 12px; font-weight: bold; margin-right: 12px; flex-shrink: 0; z-index: 1; }
+        .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .step-content p { font-size: 12px; color: #888; }
+        .highlight { color: #F56C6C; font-weight: bold; }
+
+        /* --- 底部悬浮按钮 (核心交互) --- */
+        .footer-cta { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 12px 16px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 99; }
+        
+        /* 微信开放标签外壳 */
+        .wx-btn-wrapper { width: 100%; height: 48px; }
+        
+        /* 模拟按钮样式 (用于非微信环境或加载前展示) */
+        .mock-btn {
+            width: 100%; height: 48px; background: #07C160; color: #fff; 
+            border-radius: 24px; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: bold; text-decoration: none; border: none; outline: none;
+        }
+        .mock-btn img { width: 20px; height: 20px; margin-right: 8px; filter: brightness(100); }
+
+        /* Toast 提示 */
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: #fff; padding: 10px 20px; border-radius: 6px; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1000; }
+        .toast.show { opacity: 1; }
+
+    </style>
+</head>
+<body>
+
+    <!-- 顶部 -->
+    <div class="header">
+        <img src="https://cdn-icons-png.flaticon.com/512/7613/7613913.png" alt="盾牌">
+        <span>官方正版防伪验证</span>
+    </div>
+
+    <!-- 图书信息卡片 -->
+    <div class="card">
+        <div class="book-info">
+            <!-- 封面图：实际开发中通过URL参数动态替换 -->
+            <img src="https://via.placeholder.com/160x220?text=Book" id="bookCover" class="book-cover" alt="图书封面">
+            <div class="book-details">
+                <span class="status-tag">待激活</span>
+                <div class="book-title" id="bookTitle">正在读取图书信息...</div>
+                <div class="book-desc">包含：名师视频讲讲解 · 智能错题本 · 考点练习</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频演示 -->
+    <div class="section-title">30秒学会激活 (必看)</div>
+    <div class="video-wrapper">
+        <div class="video-ratio" onclick="playVideoPrompt()">
+            <div class="video-placeholder">
+                <div class="play-btn"><div class="play-icon"></div></div>
+                <div class="video-text">点击播放操作演示</div>
+            </div>
+            <!-- 实际开发中替换为 video 标签 -->
+            <!-- <video src="your-video-url.mp4" controls style="width:100%; height:100%; position:absolute; top:0;"></video> -->
+        </div>
+    </div>
+
+    <!-- 操作步骤 -->
+    <div class="section-title">激活步骤</div>
+    <div class="steps-container">
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h4>点击下方绿色按钮</h4>
+                <p>允许跳转打开“家长端小程序”</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h4>微信快捷登录</h4>
+                <p>无需输入手机号，一键授权登录</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h4>自动弹出激活窗</h4>
+                <p>系统已自动识别激活码，点击<span class="highlight">“确认”</span>即可</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部悬浮按钮 -->
+    <div class="footer-cta">
+        <!-- 
+            重要：wx-open-launch-weapp 是微信SDK专用标签。
+            在实际开发中，需要后端配置 JS-SDK 权限签名 (wx.config) 才能生效。
+            下方注释部分是标准写法。
+        -->
+        
+        <!-- 
+        <wx-open-launch-weapp
+          id="launch-btn"
+          username="gh_xxxxxxxx"  <-- 小程序原始ID
+          path="pages/index/index?activateCode=YOUR_CODE_HERE" <-- 携带激活码参数
+          style="position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden;">
+          <script type="text/wxtag-template">
+            <style>.btn { width: 100%; height: 48px; background: #07C160; color: #fff; border-radius: 24px; text-align: center; line-height: 48px; font-size: 16px; font-weight: bold; border: none; }</style>
+            <button class="btn">打开小程序激活</button>
+          </script>
+        </wx-open-launch-weapp> 
+        -->
+
+        <!-- 这是一个模拟的按钮，用于演示视觉效果 -->
+        <button class="mock-btn" onclick="handleJump()">
+            <img src="https://open.weixin.qq.com/zh_CN/htmledition/res/assets/res-design/download/icon64_wx_logo.png" alt="WX">
+            打开小程序激活
+        </button>
+    </div>
+
+    <div class="toast" id="toast">请在微信客户端中打开</div>
+
+    <script>
+        // 1. 模拟从URL获取图书信息的逻辑
+        // 真实链接示例: index.html?bookName=小学语文六年级下&key=XYZ123
+        function initPageParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookName = urlParams.get('bookName');
+            
+            if(bookName) {
+                document.getElementById('bookTitle').innerText = bookName;
+                // 实际场景可以根据ID去后端换取真实封面图
+            } else {
+                document.getElementById('bookTitle').innerText = "小学语文 同步作文公式法 六年级下 2024版";
+            }
+            
+            // 模拟将 Key 写入剪贴板的准备工作
+            const key = urlParams.get('key') || 'DEMO-CODE-1234';
+            window.activateKey = key;
+        }
+
+        // 2. 模拟点击逻辑
+        function handleJump() {
+            // 检测是否在微信内 (简单判断)
+            const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+
+            if (isWechat) {
+                // 在真实代码中，这里不需要 onclick，而是依靠 <wx-open-launch-weapp> 标签
+                // 这里为了演示，提示用户
+                showToast("真实环境将直接唤起小程序");
+                
+                // 模拟：如果有后端生成的 URL Link (https://wxaurl.cn/...)
+                // window.location.href = "https://wxaurl.cn/YourLink";
+            } else {
+                showToast("请使用微信扫一扫");
+            }
+        }
+
+        function playVideoPrompt() {
+            showToast("此处播放激活教程视频");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // 初始化
+        initPageParams();
+    </script>
+</body>
+</html>
