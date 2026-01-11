@@ -159,7 +159,7 @@
     <!-- 4. 增强练习选择弹窗 -->
     <div id="enhanced-practice-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleEnhancedPracticeModal()"></div>
-        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 pb-24 modal-enter max-w-md mx-auto left-0 right-0">
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800" id="enhanced-modal-title">选择增强练习卷</h3>
                 <button onclick="toggleEnhancedPracticeModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -175,7 +175,7 @@
     <!-- 5. 教材切换弹窗 (筛选教辅) -->
     <div id="textbook-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleTextbookModal()"></div>
-        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 pb-24 modal-enter max-w-md mx-auto left-0 right-0">
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800">筛选教辅</h3>
                 <button onclick="toggleTextbookModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -246,7 +246,7 @@
     <!-- 6. 专栏总览弹窗 -->
     <div id="analytics-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="toggleAnalyticsModal()"></div>
-        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 pb-24 modal-enter max-w-md mx-auto left-0 right-0">
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800">专栏学情总览</h3>
                 <button onclick="toggleAnalyticsModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -288,7 +288,7 @@
     <!-- 7. 个性化练习生成弹窗 -->
     <div id="personalized-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/40 transition-opacity" onclick="togglePersonalizedModal()"></div>
-        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 pb-24 modal-enter max-w-md mx-auto left-0 right-0">
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800">生成个性化练习</h3>
                 <button onclick="togglePersonalizedModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -451,12 +451,12 @@
                              actionHtml = `
                                 ${extraBtn}
                                 <span class="text-xs text-gray-300 mr-2">批阅中...</span>
-                                <button class="text-xs bg-[#06b6d4] text-white px-3 py-1.5 rounded-full shadow-sm shadow-cyan-200 font-bold active:scale-95 transition-transform" onclick="alert('标记错题')">标记错题</button>
+                                <button class="text-xs bg-[#06b6d4] text-white px-3 py-1.5 rounded-full shadow-sm shadow-cyan-200 font-bold active:scale-95 transition-transform" onclick="window.location.href='jsx_collect_wrong.html'">标记错题</button>
                             `;
                         } else {
                              actionHtml = `
                                 ${extraBtn}
-                                <button class="text-xs bg-[#06b6d4] text-white px-3 py-1.5 rounded-full shadow-sm shadow-cyan-200 font-bold active:scale-95 transition-transform" onclick="alert('标记错题')">标记错题</button>
+                                <button class="text-xs bg-[#06b6d4] text-white px-3 py-1.5 rounded-full shadow-sm shadow-cyan-200 font-bold active:scale-95 transition-transform" onclick="window.location.href='jsx_collect_wrong.html'">标记错题</button>
                             `;
                         }
                     }
@@ -522,16 +522,30 @@
             toggleEnhancedPracticeModal();
         }
 
+        // 通用弹窗切换函数（带 postMessage）
+        function toggleModalWithMessage(modalId) {
+            const modal = document.getElementById(modalId);
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: true }, '*');
+            } else {
+                modal.classList.add('hidden');
+                window.parent.postMessage({ type: 'SET_MODAL_ACTIVE', active: false }, '*');
+            }
+        }
+
         function toggleEnhancedPracticeModal() {
-            const modal = document.getElementById('enhanced-practice-modal');
-            modal.classList.toggle('hidden');
+            toggleModalWithMessage('enhanced-practice-modal');
         }
 
         function togglePersonalizedModal(lessonTitle) {
             const modal = document.getElementById('personalized-modal');
             if (lessonTitle) document.getElementById('personalized-target-title').textContent = lessonTitle;
-            modal.classList.toggle('hidden');
+            // 使用通用函数处理显示/隐藏和通信
+            toggleModalWithMessage('personalized-modal');
         }
+
 
         function selectDifficulty(btn, level) {
             const container = document.getElementById('difficulty-selector');
@@ -551,8 +565,7 @@
         }
 
         function toggleTextbookModal() {
-            const modal = document.getElementById('textbook-modal');
-            modal.classList.toggle('hidden');
+            toggleModalWithMessage('textbook-modal');
         }
 
         function selectTextbook(version) {
@@ -569,8 +582,7 @@
         }
 
         function toggleAnalyticsModal() {
-            const modal = document.getElementById('analytics-modal');
-            modal.classList.toggle('hidden');
+            toggleModalWithMessage('analytics-modal');
         }
 
         function viewDetails(lesson, action, detail) {

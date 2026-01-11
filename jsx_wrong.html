@@ -163,9 +163,9 @@
         /* 悬浮按钮 (FAB) */
         .fab-container {
             position: fixed;
-            bottom: 30px;
+            bottom: 100px;
             right: 20px;
-            z-index: 50;
+            z-index: 40;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -548,6 +548,21 @@
             </div>
         </div>
 
+        <!-- D. 错误原因选择弹窗 (Reason Modal) -->
+        <div id="reason-modal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="toggleModal('reason-modal')"></div>
+            <div class="absolute bottom-0 w-full bg-white rounded-t-3xl p-6 modal-enter max-w-md mx-auto left-0 right-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">选择错误原因</h3>
+                    <button onclick="toggleModal('reason-modal')" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="icon-base"></i></button>
+                </div>
+                <div class="grid grid-cols-4 gap-3 mb-8" id="reason-options-container">
+                    <!-- Options injected via JS -->
+                </div>
+                <button onclick="saveReason()" class="w-full py-3.5 rounded-xl bg-[#09C0D7] text-white font-bold text-sm shadow-lg shadow-cyan-100 hover:bg-[#08acc0] transition-colors">保存修改</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -776,9 +791,60 @@
             toggleModal('ai-qa-modal');
         }
 
+        // --- 错因编辑逻辑 ---
+        let currentEditingId = null;
+        let currentSelectedReason = '';
+        const REASON_OPTIONS = ['审题不清', '概念未掌握', '运算错误', '没有思路', '马虎粗心', '公式记错', '书写不规范', '步骤遗漏'];
+
         function editMistakeNote(id) {
-            // 模拟调起编辑备注
-            alert('调起手动备注编辑框，针对错题 ID: ' + id);
+            currentEditingId = id;
+            const mistake = MOCK_MISTAKES.find(m => m.id == id);
+            if (mistake) {
+                currentSelectedReason = mistake.reason || '其他';
+                renderReasonOptions();
+                toggleModal('reason-modal');
+            }
+        }
+
+        function renderReasonOptions() {
+            const container = document.getElementById('reason-options-container');
+            container.innerHTML = '';
+            
+            REASON_OPTIONS.forEach(reason => {
+                const isSelected = reason === currentSelectedReason;
+                const btn = document.createElement('button');
+                // 动态样式：选中时高亮，未选中时灰色
+                let classes = 'py-2 rounded-lg border font-medium text-[12px] transition-colors ';
+                if (isSelected) {
+                    classes += 'border-[#09C0D7] text-[#09C0D7] bg-[#09C0D7]/10 font-bold shadow-sm';
+                } else {
+                    classes += 'border-gray-200 text-gray-600 hover:bg-gray-50';
+                }
+                btn.className = classes;
+                btn.innerText = reason;
+                // 防止点击冒泡关闭弹窗
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    selectReason(reason);
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function selectReason(reason) {
+            currentSelectedReason = reason;
+            renderReasonOptions();
+        }
+
+        function saveReason() {
+            if (currentEditingId !== null) {
+                const mistakeIndex = MOCK_MISTAKES.findIndex(m => m.id == currentEditingId);
+                if (mistakeIndex !== -1) {
+                    MOCK_MISTAKES[mistakeIndex].reason = currentSelectedReason;
+                    renderMistakeList(); // 重新渲染列表以更新标签
+                    toggleModal('reason-modal');
+                }
+            }
         }
 
         // --- 学科切换 Logic ---
